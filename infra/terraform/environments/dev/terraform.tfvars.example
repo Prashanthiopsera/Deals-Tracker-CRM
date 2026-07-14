@@ -1,0 +1,17 @@
+# Example Terraform variable values for the dev environment.
+# Copy this file to terraform.tfvars and fill in the appropriate values.
+# Do NOT commit terraform.tfvars — it is excluded by .gitignore.
+
+# Primary AWS region. Keep as us-east-1 for US data residency.
+# Change to eu-west-1 or eu-central-1 only when GDPR requires EU residency.
+aws_region = "us-east-1"
+
+# Environment identifier. Must match the directory name.
+environment = "dev"
+
+# Project name. Do not change unless coordinating a full resource rename.
+project_name = "p7vc-crm"
+
+# Set to true to enable EU-region infrastructure for GDPR Article 46 compliance.
+# Requires eu-west-1 provider alias to be configured and additional GDPR WOs applied.
+eu_region_deployment = false
