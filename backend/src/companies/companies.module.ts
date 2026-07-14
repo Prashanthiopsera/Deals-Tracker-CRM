@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { AuditModule } from '../audit/audit.module';
 import { InMemoryAuditQueuePublisher } from '../audit/authorization-audit.publisher';
 import { Company } from '../database/entities/company.entity';
 import { CompaniesController } from './companies.controller';
+import { CompaniesInMemoryService } from './companies-in-memory.service';
 import { CompaniesService, SqsCompanyAuditPublisher } from './companies.service';
 import { OwnershipFieldInterceptor } from './ownership-field.interceptor';
 import { OwnershipPatchGuard } from './ownership-patch.guard';
@@ -12,7 +14,7 @@ import { OwnershipPatchGuard } from './ownership-patch.guard';
   imports: [TypeOrmModule.forFeature([Company]), AuditModule],
   controllers: [CompaniesController],
   providers: [
-    CompaniesService,
+    CompaniesInMemoryService,
     OwnershipFieldInterceptor,
     OwnershipPatchGuard,
     {
@@ -21,10 +23,18 @@ import { OwnershipPatchGuard } from './ownership-patch.guard';
       inject: [InMemoryAuditQueuePublisher],
     },
     {
-      provide: 'CompanyAuditPublisher',
-      useExisting: SqsCompanyAuditPublisher,
+      provide: CompaniesService,
+      useFactory: (
+        repo: Repository<Company>,
+        audit: SqsCompanyAuditPublisher,
+        memory: CompaniesInMemoryService,
+      ) =>
+        process.env.COMPANIES_IN_MEMORY === 'true'
+          ? memory
+          : new CompaniesService(repo, audit),
+      inject: [getRepositoryToken(Company), SqsCompanyAuditPublisher, CompaniesInMemoryService],
     },
   ],
-  exports: [OwnershipFieldInterceptor],
+  exports: [OwnershipFieldInterceptor, CompaniesService],
 })
 export class CompaniesModule {}

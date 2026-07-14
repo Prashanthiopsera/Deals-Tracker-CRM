@@ -56,6 +56,7 @@ describe('CompaniesService', () => {
     const result = await service.create(
       { company_name: payload.company_name as string },
       'actor-1',
+      'Director',
     );
     expect(result.id).toBeDefined();
     expect(queue.messages).toHaveLength(1);

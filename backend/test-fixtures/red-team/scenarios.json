@@ -20,7 +20,7 @@
     { "id": "intern-delete-company", "role": "Intern", "method": "DELETE", "path": "/api/companies/{{companyId}}", "expectedStatus": 403 },
     { "id": "associate-delete-company", "role": "Associate", "method": "DELETE", "path": "/api/companies/{{companyId}}", "expectedStatus": 403 },
     { "id": "principal-delete-company", "role": "Principal", "method": "DELETE", "path": "/api/companies/{{companyId}}", "expectedStatus": 403 },
-    { "id": "director-delete-company", "role": "Director", "method": "DELETE", "path": "/api/companies/{{companyId}}", "expectedStatus": 200, "resetAfter": true },
+    { "id": "director-delete-company", "role": "Director", "method": "DELETE", "path": "/api/companies/{{companyId}}", "expectedStatus": 204, "resetAfter": true },
     { "id": "intern-patch-ownership", "role": "Intern", "method": "PATCH", "path": "/api/companies/{{companyId}}", "body": { "deal_lead_id": "99999999-9999-9999-9999-999999999999" }, "expectedStatus": 403 },
     { "id": "associate-patch-ownership", "role": "Associate", "method": "PATCH", "path": "/api/companies/{{companyId}}", "body": { "deal_lead_id": "99999999-9999-9999-9999-999999999999" }, "expectedStatus": 403 },
     { "id": "principal-patch-ownership", "role": "Principal", "method": "PATCH", "path": "/api/companies/{{companyId}}", "body": { "deal_lead_id": "99999999-9999-9999-9999-999999999999" }, "expectedStatus": 200 },

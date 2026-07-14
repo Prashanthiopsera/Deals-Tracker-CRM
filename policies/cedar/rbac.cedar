@@ -57,6 +57,13 @@ forbid (
   resource is P7VC::Company
 );
 
+@id("director-company-delete")
+permit (
+  principal in P7VC::Role::"Director",
+  action == P7VC::Action::"delete",
+  resource is P7VC::Company
+);
+
 @id("intern-deny-create-delete-reassign")
 forbid (
   principal in P7VC::Role::"Intern",

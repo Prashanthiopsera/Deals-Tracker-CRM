@@ -18,7 +18,13 @@ import {
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AuthUserContext } from '../auth/auth.types';
-import { CreateCompanyDto, ListCompaniesQueryDto, UpdateCompanyDto, validateCreateCompanyDto } from './companies.dto';
+import { CedarAuthorize } from '../authorization/cedar.guard';
+import {
+  CreateCompanyDto,
+  ListCompaniesQueryDto,
+  UpdateCompanyDto,
+  validateCreateCompanyDto,
+} from './companies.dto';
 import { CompaniesService } from './companies.service';
 import { OwnershipFieldInterceptor } from './ownership-field.interceptor';
 import { OwnershipPatchGuard } from './ownership-patch.guard';
@@ -54,7 +60,7 @@ export class CompaniesController {
     } catch (error) {
       throw new BadRequestException({ message: String(error) });
     }
-    return this.companies.create(body, req.user.p7vcUserId);
+    return this.companies.create(body, req.user.p7vcUserId, req.user.p7vcRole);
   }
 
   @Patch(':id/owner')
@@ -73,7 +79,7 @@ export class CompaniesController {
     @Req() req: Request & { user: AuthUserContext },
   ) {
     try {
-      return await this.companies.patch(id, body, req.user.p7vcUserId);
+      return await this.companies.patch(id, body, req.user.p7vcUserId, req.user.p7vcRole);
     } catch {
       throw new NotFoundException({ message: 'Company not found' });
     }
@@ -81,9 +87,10 @@ export class CompaniesController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @CedarAuthorize('delete', 'Company')
   async delete(@Param('id') id: string, @Req() req: Request & { user: AuthUserContext }) {
     try {
-      await this.companies.softDelete(id, req.user.p7vcUserId);
+      await this.companies.softDelete(id, req.user.p7vcUserId, req.user.p7vcRole);
     } catch {
       throw new NotFoundException({ message: 'Company not found' });
     }

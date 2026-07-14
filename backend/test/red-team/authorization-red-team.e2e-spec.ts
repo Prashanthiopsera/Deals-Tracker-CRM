@@ -78,7 +78,9 @@ function generatedMatrixScenarios(): RedTeamScenario[] {
           role === 'Director'
             ? action === 'create'
               ? 201
-              : 200
+              : action === 'delete'
+                ? 204
+                : 200
             : role === 'Intern' && ['create', 'delete', 'reassign'].includes(action)
               ? 403
               : role === 'Associate' && ['delete', 'reassign'].includes(action)

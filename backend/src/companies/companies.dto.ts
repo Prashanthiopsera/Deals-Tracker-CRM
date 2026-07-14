@@ -92,8 +92,11 @@ export class ListCompaniesQueryDto {
 }
 
 export function validateCreateCompanyDto(payload: Record<string, unknown>): CreateCompanyDto {
-  const dto = Object.assign(new CreateCompanyDto(), payload);
-  if (!dto.company_name || typeof dto.company_name !== 'string' || !dto.company_name.trim()) {
+  const companyName = payload.company_name ?? payload.name;
+  const dto = Object.assign(new CreateCompanyDto(), payload, {
+    company_name: typeof companyName === 'string' ? companyName : '',
+  });
+  if (!dto.company_name.trim()) {
     throw new Error('company_name is required');
   }
   return dto;
