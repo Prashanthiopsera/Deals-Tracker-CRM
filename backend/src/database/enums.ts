@@ -7,14 +7,24 @@ export enum UserRole {
 }
 
 export enum DealStage {
-  SOURCING = 'Sourcing',
-  INITIAL_SCREEN = 'Initial Screen',
-  DEEP_DILIGENCE = 'Deep Diligence',
-  IC_REVIEW = 'IC Review',
-  TERM_SHEET = 'Term Sheet',
-  CLOSED_WON = 'Closed Won',
-  CLOSED_LOST = 'Closed Lost',
-  PASSED = 'Passed',
+  SOURCED = 'sourced',
+  SCREENING = 'screening',
+  DILIGENCE = 'diligence',
+  PARTNER_IC_REVIEW = 'partner_ic_review',
+  TERM_SHEET = 'term_sheet',
+  CLOSED_WON = 'closed_won',
+  CLOSED_LOST = 'closed_lost',
+  CLOSED_PASSED = 'closed_passed',
+}
+
+export enum CompanyFundingStage {
+  SEED = 'seed',
+  SERIES_A = 'series_a',
+  SERIES_B = 'series_b',
+  SERIES_C = 'series_c',
+  GROWTH = 'growth',
+  LATE_STAGE = 'late_stage',
+  OTHER = 'other',
 }
 
 export enum CompanyStatus {

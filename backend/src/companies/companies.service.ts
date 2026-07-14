@@ -5,9 +5,9 @@ import { CompanyStatus } from '../database/enums';
 export interface CompanyRecord {
   id: string;
   name: string;
-  p7vc_deal_lead: string | null;
-  deal_lead_support_1: string | null;
-  deal_lead_support_2: string | null;
+  deal_lead_id: string | null;
+  support_1_id: string | null;
+  support_2_id: string | null;
   notes: string | null;
   status: CompanyStatus;
 }
@@ -19,9 +19,9 @@ export class CompaniesService {
       {
         id: '11111111-1111-1111-1111-111111111111',
         name: 'Acme Robotics',
-        p7vc_deal_lead: '22222222-2222-2222-2222-222222222222',
-        deal_lead_support_1: '33333333-3333-3333-3333-333333333333',
-        deal_lead_support_2: '44444444-4444-4444-4444-444444444444',
+        deal_lead_id: '22222222-2222-2222-2222-222222222222',
+        support_1_id: '33333333-3333-3333-3333-333333333333',
+        support_2_id: '44444444-4444-4444-4444-444444444444',
         notes: 'Priority target',
         status: CompanyStatus.ACTIVE,
       },
@@ -50,9 +50,9 @@ export class CompaniesService {
     const company = this.getById(id);
     if (typeof body.name === 'string') company.name = body.name;
     if (typeof body.notes === 'string') company.notes = body.notes;
-    if (typeof body.deal_lead_id === 'string') company.p7vc_deal_lead = body.deal_lead_id;
-    if (typeof body.support1_id === 'string') company.deal_lead_support_1 = body.support1_id;
-    if (typeof body.support2_id === 'string') company.deal_lead_support_2 = body.support2_id;
+    if (typeof body.deal_lead_id === 'string') company.deal_lead_id = body.deal_lead_id;
+    if (typeof body.support1_id === 'string') company.support_1_id = body.support1_id;
+    if (typeof body.support2_id === 'string') company.support_2_id = body.support2_id;
     return { ...company };
   }
 
@@ -60,9 +60,9 @@ export class CompaniesService {
     const company: CompanyRecord = {
       id: randomUUID(),
       name,
-      p7vc_deal_lead: null,
-      deal_lead_support_1: null,
-      deal_lead_support_2: null,
+      deal_lead_id: null,
+      support_1_id: null,
+      support_2_id: null,
       notes: null,
       status: CompanyStatus.ACTIVE,
     };

@@ -27,9 +27,9 @@ export function toCompanyResponse(company: Record<string, unknown>): Record<stri
   return {
     id: company.id,
     name: company.name,
-    deal_lead_id: company.p7vc_deal_lead ?? company.deal_lead_id,
-    support1_id: company.deal_lead_support_1 ?? company.support1_id,
-    support2_id: company.deal_lead_support_2 ?? company.support2_id,
+    deal_lead_id: company.deal_lead_id ?? company.dealLeadId ?? company.p7vc_deal_lead,
+    support1_id: company.support_1_id ?? company.support1Id ?? company.deal_lead_support_1,
+    support2_id: company.support_2_id ?? company.support2Id ?? company.deal_lead_support_2,
     notes: company.notes,
     status: company.status,
   };
