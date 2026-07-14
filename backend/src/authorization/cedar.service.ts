@@ -4,50 +4,13 @@ import {
   Logger,
   ServiceUnavailableException,
 } from '@nestjs/common';
+import { CedarCache } from './cedar-cache';
 import {
   CedarAction,
   CedarAuthDecision,
   CedarAuthRequest,
   CedarPolicyClient,
 } from './cedar.types';
-
-interface CacheEntry {
-  decision: CedarAuthDecision;
-  expiresAt: number;
-}
-
-@Injectable()
-export class InMemoryCedarCache {
-  private readonly entries = new Map<string, CacheEntry>();
-  private readonly ttlMs = 60_000;
-  private readonly maxEntries = 1000;
-
-  get(key: string): CedarAuthDecision | undefined {
-    const entry = this.entries.get(key);
-    if (!entry) return undefined;
-    if (Date.now() > entry.expiresAt) {
-      this.entries.delete(key);
-      return undefined;
-    }
-    return { ...entry.decision, cached: true };
-  }
-
-  set(key: string, decision: CedarAuthDecision): void {
-    if (this.entries.size >= this.maxEntries) {
-      const firstKey = this.entries.keys().next().value as string;
-      this.entries.delete(firstKey);
-    }
-    this.entries.set(key, { decision, expiresAt: Date.now() + this.ttlMs });
-  }
-
-  invalidateForUser(userId: string): void {
-    for (const key of this.entries.keys()) {
-      if (key.startsWith(`${userId}:`)) {
-        this.entries.delete(key);
-      }
-    }
-  }
-}
 
 @Injectable()
 export class VerifiedPermissionsClient implements CedarPolicyClient {
@@ -70,6 +33,7 @@ export class VerifiedPermissionsClient implements CedarPolicyClient {
       this.logger.log(
         JSON.stringify({
           actor: request.userId,
+          role: request.role,
           action: request.action,
           resource: `${request.resourceType}:${request.resourceId ?? '*'}`,
           decision: allowed ? 'permit' : 'deny',
@@ -101,22 +65,22 @@ export class VerifiedPermissionsClient implements CedarPolicyClient {
 @Injectable()
 export class CedarAuthorizationService {
   constructor(
-    private readonly client: VerifiedPermissionsClient,
-    private readonly cache: InMemoryCedarCache,
+    private readonly client: CedarPolicyClient,
+    private readonly cache: CedarCache,
   ) {}
 
   async authorize(request: CedarAuthRequest): Promise<CedarAuthDecision> {
     const cacheKey = `${request.userId}:${request.action}:${request.resourceType}:${request.resourceId ?? '*'}`;
-    const cached = this.cache.get(cacheKey);
+    const cached = await this.cache.get(cacheKey);
     if (cached) return cached;
 
     const decision = await this.client.isAuthorized(request);
-    this.cache.set(cacheKey, decision);
+    await this.cache.set(cacheKey, decision);
     return decision;
   }
 
-  invalidateUser(userId: string): void {
-    this.cache.invalidateForUser(userId);
+  async invalidateUser(userId: string): Promise<void> {
+    await this.cache.invalidateForUser(userId);
   }
 }
 
@@ -127,7 +91,7 @@ export function assertAuthorized(decision: CedarAuthDecision): void {
 }
 
 export function buildAuthRequest(
-  user: { p7vcUserId: string; p7vcRole: string },
+  user: { p7vcUserId: string; p7vcRole: string; p7vcTeamId?: string },
   action: CedarAction,
   resourceType: string,
   resourceId?: string,
@@ -135,6 +99,7 @@ export function buildAuthRequest(
   return {
     userId: user.p7vcUserId,
     role: user.p7vcRole,
+    teamId: user.p7vcTeamId,
     action,
     resourceType,
     resourceId,

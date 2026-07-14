@@ -13,12 +13,11 @@ import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AuthUserContext } from '../auth/auth.types';
 import { CedarAuthorize } from '../authorization/cedar.guard';
-import { CedarGuard } from '../authorization/cedar.guard';
 import { UserRole } from '../database/enums';
 import { AdminUsersService } from './admin-users.service';
 
 @Controller('admin/users')
-@UseGuards(JwtAuthGuard, CedarGuard)
+@UseGuards(JwtAuthGuard)
 export class AdminUsersController {
   constructor(private readonly users: AdminUsersService) {}
 

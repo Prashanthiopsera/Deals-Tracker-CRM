@@ -9,6 +9,7 @@ export type CedarAction =
 export interface CedarAuthRequest {
   userId: string;
   role: string;
+  teamId?: string;
   action: CedarAction;
   resourceType: string;
   resourceId?: string;

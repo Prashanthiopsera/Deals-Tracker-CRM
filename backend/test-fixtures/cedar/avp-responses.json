@@ -1,0 +1,14 @@
+{
+  "directorReadCompany": {
+    "decision": "ALLOW",
+    "determiningPolicies": [{ "policyId": "director-full-access" }]
+  },
+  "internDeleteCompany": {
+    "decision": "DENY",
+    "determiningPolicies": [{ "policyId": "deny-default" }]
+  },
+  "serviceUnavailable": {
+    "error": "ServiceUnavailable",
+    "message": "Authorization service unavailable"
+  }
+}

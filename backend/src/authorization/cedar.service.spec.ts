@@ -1,7 +1,7 @@
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, ServiceUnavailableException } from '@nestjs/common';
+import { InMemoryCedarCache } from './cedar-cache';
 import {
   CedarAuthorizationService,
-  InMemoryCedarCache,
   VerifiedPermissionsClient,
   assertAuthorized,
   buildAuthRequest,
