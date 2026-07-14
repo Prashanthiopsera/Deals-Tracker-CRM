@@ -72,3 +72,13 @@ output "aurora_master_secret_arn" {
   description = "Secrets Manager ARN for Aurora master credentials."
   value       = module.aurora.master_user_secret_arn
 }
+
+output "ecs_cluster_name" {
+  description = "ECS cluster name."
+  value       = module.ecs.cluster_name
+}
+
+output "alb_dns_name" {
+  description = "Application Load Balancer DNS name."
+  value       = module.ecs.alb_dns_name
+}

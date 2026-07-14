@@ -16,3 +16,10 @@ aurora_database_name           = "p7vc_crm"
 aurora_serverless_min_capacity = 0.5
 aurora_serverless_max_capacity = 8
 aurora_deletion_protection     = true
+
+ecs_container_cpu              = 1024
+ecs_container_memory           = 2048
+ecs_desired_count              = 2
+ecs_autoscaling_min_capacity   = 2
+ecs_autoscaling_max_capacity   = 8
+ecs_container_image            = "public.ecr.aws/docker/library/nginx:stable-alpine"

@@ -12,7 +12,7 @@ root modules in `environments/dev`, `environments/staging`, and `environments/pr
 |--------|----|--------|-------------|
 | `vpc` | WO-002 | Implemented | VPC, public/private/isolated subnets, NAT gateways, flow logs, NACLs |
 | `aurora` | WO-003 | Implemented | Aurora PostgreSQL Serverless v2, pgvector, KMS, Secrets Manager rotation |
-| `ecs` | WO-004 | Planned | ECS Fargate cluster, task definitions, service mesh |
+| `ecs` | WO-004 | Implemented | ECS Fargate cluster, ALB, auto-scaling, Cloud Map service discovery |
 | `api-gateway` | WO-005 | Planned | API Gateway REST/HTTP with WAF and usage plans |
 | `s3-kms` | WO-006/007 | Planned | S3 buckets with KMS CMK encryption |
 | `sqs-sns` | WO-008 | Planned | SQS queues and SNS topics for async messaging |

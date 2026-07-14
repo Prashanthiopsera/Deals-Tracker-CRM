@@ -84,3 +84,39 @@ variable "aurora_deletion_protection" {
   type        = bool
   default     = false
 }
+
+variable "ecs_container_cpu" {
+  description = "Fargate task CPU units."
+  type        = number
+  default     = 512
+}
+
+variable "ecs_container_memory" {
+  description = "Fargate task memory in MiB."
+  type        = number
+  default     = 1024
+}
+
+variable "ecs_desired_count" {
+  description = "Desired ECS task count."
+  type        = number
+  default     = 1
+}
+
+variable "ecs_autoscaling_min_capacity" {
+  description = "Minimum ECS task count."
+  type        = number
+  default     = 1
+}
+
+variable "ecs_autoscaling_max_capacity" {
+  description = "Maximum ECS task count."
+  type        = number
+  default     = 4
+}
+
+variable "ecs_container_image" {
+  description = "Container image URI."
+  type        = string
+  default     = "public.ecr.aws/docker/library/nginx:stable-alpine"
+}

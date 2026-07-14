@@ -88,3 +88,39 @@ variable "aurora_deletion_protection" {
   type        = bool
   default     = true
 }
+
+variable "ecs_container_cpu" {
+  description = "Fargate task CPU units."
+  type        = number
+  default     = 1024
+}
+
+variable "ecs_container_memory" {
+  description = "Fargate task memory in MiB."
+  type        = number
+  default     = 2048
+}
+
+variable "ecs_desired_count" {
+  description = "Desired ECS task count."
+  type        = number
+  default     = 2
+}
+
+variable "ecs_autoscaling_min_capacity" {
+  description = "Minimum ECS task count for auto-scaling."
+  type        = number
+  default     = 2
+}
+
+variable "ecs_autoscaling_max_capacity" {
+  description = "Maximum ECS task count for auto-scaling."
+  type        = number
+  default     = 10
+}
+
+variable "ecs_container_image" {
+  description = "Container image URI for the NestJS API."
+  type        = string
+  default     = "public.ecr.aws/docker/library/nginx:stable-alpine"
+}

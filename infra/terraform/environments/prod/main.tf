@@ -46,3 +46,27 @@ module "aurora" {
 
   common_tags = local.common_tags
 }
+
+module "ecs" {
+  source = "../../modules/ecs"
+
+  project_name = var.project_name
+  environment  = var.environment
+  aws_region   = var.aws_region
+
+  vpc_id             = module.vpc.vpc_id
+  private_subnet_ids = module.vpc.private_subnet_ids
+  public_subnet_ids  = module.vpc.public_subnet_ids
+
+  container_cpu    = var.ecs_container_cpu
+  container_memory = var.ecs_container_memory
+  desired_count    = var.ecs_desired_count
+
+  autoscaling_min_capacity = var.ecs_autoscaling_min_capacity
+  autoscaling_max_capacity = var.ecs_autoscaling_max_capacity
+
+  container_image   = var.ecs_container_image
+  aurora_secret_arn = module.aurora.master_user_secret_arn
+
+  common_tags = local.common_tags
+}
