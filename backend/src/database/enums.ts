@@ -27,6 +27,30 @@ export enum CompanyFundingStage {
   OTHER = 'other',
 }
 
+export enum PiiClassification {
+  PUBLIC = 'public',
+  INTERNAL = 'internal',
+  CONFIDENTIAL = 'confidential',
+  RESTRICTED = 'restricted',
+}
+
+export enum ActivityType {
+  EMAIL = 'email',
+  MEETING = 'meeting',
+  CALENDAR_EVENT = 'calendar_event',
+  NOTE = 'note',
+  CALL = 'call',
+}
+
+export enum DocumentType {
+  DECK = 'deck',
+  MEMO = 'memo',
+  TERM_SHEET = 'term_sheet',
+  IC_MEMO = 'ic_memo',
+  FINANCIAL_MODEL = 'financial_model',
+  OTHER = 'other',
+}
+
 export enum CompanyStatus {
   ACTIVE = 'Active',
   INACTIVE = 'Inactive',
