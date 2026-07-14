@@ -6,3 +6,7 @@ aws_region           = "us-east-1"
 environment          = "staging"
 project_name         = "p7vc-crm"
 eu_region_deployment = false
+
+vpc_cidr           = "10.1.0.0/16"
+availability_zones = []
+vpc_az_count       = 2

@@ -6,17 +6,17 @@ Each module encapsulates a self-contained AWS resource group with its own
 variables, outputs, and documentation. Modules are consumed by environment
 root modules in `environments/dev`, `environments/staging`, and `environments/prod`.
 
-## Planned Modules (upcoming work orders)
+## Modules
 
-| Module | WO | Description |
-|--------|----|-------------|
-| `networking` | WO-002 | VPC, subnets, NAT gateways, security groups |
-| `aurora` | WO-003 | Aurora PostgreSQL Serverless v2 cluster with RLS |
-| `ecs` | WO-004 | ECS Fargate cluster, task definitions, service mesh |
-| `api-gateway` | WO-005 | API Gateway REST/HTTP with WAF and usage plans |
-| `s3-kms` | WO-006/007 | S3 buckets with KMS CMK encryption |
-| `sqs-sns` | WO-008 | SQS queues and SNS topics for async messaging |
-| `monitoring` | WO-009 | CloudWatch dashboards, alarms, and log groups |
+| Module | WO | Status | Description |
+|--------|----|--------|-------------|
+| `vpc` | WO-002 | Implemented | VPC, public/private/isolated subnets, NAT gateways, flow logs, NACLs |
+| `aurora` | WO-003 | Planned | Aurora PostgreSQL Serverless v2 cluster with RLS |
+| `ecs` | WO-004 | Planned | ECS Fargate cluster, task definitions, service mesh |
+| `api-gateway` | WO-005 | Planned | API Gateway REST/HTTP with WAF and usage plans |
+| `s3-kms` | WO-006/007 | Planned | S3 buckets with KMS CMK encryption |
+| `sqs-sns` | WO-008 | Planned | SQS queues and SNS topics for async messaging |
+| `monitoring` | WO-009 | Planned | CloudWatch dashboards, alarms, and log groups |
 
 ## Module Conventions
 

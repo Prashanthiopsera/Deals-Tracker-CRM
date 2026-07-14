@@ -15,3 +15,8 @@ project_name = "p7vc-crm"
 # Set to true to enable EU-region infrastructure for GDPR Article 46 compliance.
 # Requires eu-west-1 provider alias to be configured and additional GDPR WOs applied.
 eu_region_deployment = false
+
+# VPC network configuration (WO-002)
+vpc_cidr           = "10.0.0.0/16"
+availability_zones = [] # auto-select first vpc_az_count AZs in aws_region
+vpc_az_count       = 2

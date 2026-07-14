@@ -96,3 +96,21 @@ resource "aws_dynamodb_table" "terraform_lock" {
     Purpose = "terraform-state-locking"
   })
 }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# VPC Network Foundation (WO-002)
+# ─────────────────────────────────────────────────────────────────────────────
+
+module "vpc" {
+  source = "../../modules/vpc"
+
+  project_name = var.project_name
+  environment  = var.environment
+  aws_region   = var.aws_region
+
+  vpc_cidr           = var.vpc_cidr
+  availability_zones = var.availability_zones
+  az_count           = var.vpc_az_count
+
+  common_tags = local.common_tags
+}

@@ -17,3 +17,33 @@ output "eu_region_deployment" {
   description = "Whether EU-region deployment is enabled for GDPR data residency."
   value       = var.eu_region_deployment
 }
+
+output "vpc_id" {
+  description = "ID of the VPC."
+  value       = module.vpc.vpc_id
+}
+
+output "vpc_cidr_block" {
+  description = "CIDR block of the VPC."
+  value       = module.vpc.vpc_cidr_block
+}
+
+output "public_subnet_ids" {
+  description = "Public subnet IDs (NAT / ALB tier)."
+  value       = module.vpc.public_subnet_ids
+}
+
+output "private_subnet_ids" {
+  description = "Private subnet IDs (ECS Fargate tier)."
+  value       = module.vpc.private_subnet_ids
+}
+
+output "isolated_subnet_ids" {
+  description = "Isolated subnet IDs (Aurora / ElastiCache tier)."
+  value       = module.vpc.isolated_subnet_ids
+}
+
+output "availability_zones" {
+  description = "Availability zones used by the VPC."
+  value       = module.vpc.availability_zones
+}

@@ -40,3 +40,21 @@ variable "eu_region_deployment" {
   type        = bool
   default     = false
 }
+
+variable "vpc_cidr" {
+  description = "CIDR block for the VPC. Default 10.0.0.0/16 supports three subnet tiers across multiple AZs."
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
+variable "availability_zones" {
+  description = "Explicit AZ names for VPC subnet placement. Empty list auto-selects the first vpc_az_count available AZs."
+  type        = list(string)
+  default     = []
+}
+
+variable "vpc_az_count" {
+  description = "Number of availability zones to span for VPC subnets. Minimum 2 for high availability."
+  type        = number
+  default     = 2
+}
