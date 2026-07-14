@@ -62,6 +62,11 @@ export class UpdateCompanyDto {
   status?: CompanyStatus;
 }
 
+export class StageTransitionDto {
+  @IsEnum(DealStage)
+  deal_stage!: DealStage;
+}
+
 export class ListCompaniesQueryDto {
   @IsOptional()
   page?: number = 1;

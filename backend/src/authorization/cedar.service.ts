@@ -53,10 +53,10 @@ export class VerifiedPermissionsClient implements CedarPolicyClient {
     if (role === 'Director' || role === 'Admin') return true;
     if (role === 'Principal') return action !== 'delete';
     if (role === 'Associate') {
-      return ['create', 'read', 'update'].includes(action);
+      return ['create', 'read', 'update', 'stage_transition'].includes(action);
     }
     if (role === 'Intern') {
-      if (action === 'update_ownership_field') return false;
+      if (action === 'update_ownership_field' || action === 'stage_transition') return false;
       return ['read', 'update'].includes(action);
     }
     return false;

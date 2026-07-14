@@ -126,6 +126,22 @@ export class CompaniesInMemoryService {
     this.publishAudit(actorId, actorRole, 'delete', before, null, id);
   }
 
+  async transitionStage(id: string, targetStage: DealStage, actorId: string, actorRole: string) {
+    const company = this.findActive(id);
+    const before = this.toResponse(company);
+    const { validateStageTransition, stageDateKey } = await import('./stage-transitions');
+    validateStageTransition(company.dealStage, targetStage);
+    company.dealStage = targetStage;
+    company.keyDates = {
+      ...company.keyDates,
+      [stageDateKey(targetStage)]: new Date().toISOString(),
+    };
+    company.updatedAt = new Date();
+    const after = this.toResponse(company);
+    this.publishAudit(actorId, actorRole, 'stage_transition', before, after, id);
+    return after;
+  }
+
   private findActive(id: string): MemoryCompany {
     const company = this.companies.find((c) => c.id === id);
     if (!company || company.deletedAt) {
@@ -147,6 +163,7 @@ export class CompaniesInMemoryService {
       geography: company.geography,
       tags: company.tags,
       notes: company.notes,
+      key_dates: company.keyDates,
       created_at: company.createdAt,
       updated_at: company.updatedAt,
     });
@@ -155,7 +172,7 @@ export class CompaniesInMemoryService {
   private publishAudit(
     actorId: string,
     actorRole: string,
-    action: 'create' | 'update' | 'delete',
+    action: 'create' | 'update' | 'delete' | 'stage_transition',
     before: Record<string, unknown> | null,
     after: Record<string, unknown> | null,
     companyId: string,

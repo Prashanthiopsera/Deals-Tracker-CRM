@@ -22,6 +22,7 @@ import { CedarAuthorize } from '../authorization/cedar.guard';
 import {
   CreateCompanyDto,
   ListCompaniesQueryDto,
+  StageTransitionDto,
   UpdateCompanyDto,
   validateCreateCompanyDto,
 } from './companies.dto';
@@ -61,6 +62,26 @@ export class CompaniesController {
       throw new BadRequestException({ message: String(error) });
     }
     return this.companies.create(body, req.user.p7vcUserId, req.user.p7vcRole);
+  }
+
+  @Patch(':id/stage')
+  @CedarAuthorize('stage_transition', 'Company')
+  async transitionStage(
+    @Param('id') id: string,
+    @Body() body: StageTransitionDto,
+    @Req() req: Request & { user: AuthUserContext },
+  ) {
+    try {
+      return await this.companies.transitionStage(
+        id,
+        body.deal_stage,
+        req.user.p7vcUserId,
+        req.user.p7vcRole,
+      );
+    } catch (error) {
+      if (error instanceof BadRequestException) throw error;
+      throw new NotFoundException({ message: 'Company not found' });
+    }
   }
 
   @Patch(':id/owner')

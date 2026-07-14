@@ -36,6 +36,7 @@ export function toCompanyResponse(company: Record<string, unknown>): Record<stri
     tags: company.tags,
     notes: company.notes,
     status: company.status,
+    key_dates: company.key_dates ?? company.keyDates,
     created_at: company.created_at ?? company.createdAt,
     updated_at: company.updated_at ?? company.updatedAt,
   };

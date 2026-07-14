@@ -7,12 +7,13 @@ import { Company } from '../database/entities/company.entity';
 import { CompanyStatus, DealStage } from '../database/enums';
 import { CreateCompanyDto, ListCompaniesQueryDto, UpdateCompanyDto } from './companies.dto';
 import { toCompanyResponse } from './ownership-fields';
+import { validateStageTransition, stageDateKey } from './stage-transitions';
 
 export interface CompanyAuditPublisher {
   publishCompanyEvent(input: {
     actorId: string;
     actorRole: string;
-    action: 'create' | 'update' | 'delete';
+    action: 'create' | 'update' | 'delete' | 'stage_transition';
     before?: Record<string, unknown> | null;
     after?: Record<string, unknown> | null;
     companyId: string;
@@ -26,7 +27,7 @@ export class SqsCompanyAuditPublisher implements CompanyAuditPublisher {
   publishCompanyEvent(input: {
     actorId: string;
     actorRole: string;
-    action: 'create' | 'update' | 'delete';
+    action: 'create' | 'update' | 'delete' | 'stage_transition';
     before?: Record<string, unknown> | null;
     after?: Record<string, unknown> | null;
     companyId: string;
@@ -112,6 +113,33 @@ export class CompaniesService {
     return after;
   }
 
+  async transitionStage(
+    id: string,
+    targetStage: DealStage,
+    actorId: string,
+    actorRole: string,
+  ): Promise<Record<string, unknown>> {
+    const company = await this.findActive(id);
+    const before = this.toResponse(company);
+    validateStageTransition(company.dealStage, targetStage);
+    company.dealStage = targetStage;
+    company.keyDates = {
+      ...company.keyDates,
+      [stageDateKey(targetStage)]: new Date().toISOString(),
+    };
+    const saved = await this.companies.save(company);
+    const after = this.toResponse(saved);
+    this.audit.publishCompanyEvent({
+      actorId,
+      actorRole,
+      action: 'stage_transition',
+      before,
+      after,
+      companyId: id,
+    });
+    return after;
+  }
+
   async softDelete(id: string, actorId: string, actorRole = 'system'): Promise<void> {
     const company = await this.findActive(id);
     const before = this.toResponse(company);
@@ -144,6 +172,7 @@ export class CompaniesService {
       geography: company.geography,
       tags: company.tags,
       notes: company.notes,
+      key_dates: company.keyDates,
       created_at: company.createdAt,
       updated_at: company.updatedAt,
     });

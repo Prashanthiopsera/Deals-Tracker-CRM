@@ -4,6 +4,7 @@ export type CedarAction =
   | 'update'
   | 'delete'
   | 'reassign'
+  | 'stage_transition'
   | 'update_ownership_field';
 
 export interface CedarAuthRequest {

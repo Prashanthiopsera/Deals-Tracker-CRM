@@ -23,6 +23,9 @@ export function deriveCedarAction(method: string, path: string): CedarAction {
   const normalized = method.toUpperCase();
   const lowerPath = path.toLowerCase();
 
+  if (lowerPath.includes('/stage')) {
+    return 'stage_transition';
+  }
   if (lowerPath.includes('/owner') || lowerPath.endsWith('/reassign')) {
     return 'reassign';
   }
