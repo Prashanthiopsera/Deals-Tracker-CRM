@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AuditQueueMessage",
+  "type": "object",
+  "required": ["eventId", "actorId", "action", "resourceType", "resourceId", "timestamp"],
+  "properties": {
+    "eventId": { "type": "string", "format": "uuid" },
+    "actorId": { "type": "string" },
+    "action": { "type": "string", "enum": ["create", "update", "delete", "reassign"] },
+    "resourceType": { "type": "string" },
+    "resourceId": { "type": "string" },
+    "beforeState": { "type": "object" },
+    "afterState": { "type": "object" },
+    "timestamp": { "type": "string", "format": "date-time" }
+  }
+}
