@@ -1,0 +1,27 @@
+{
+  "Director": {
+    "uid": { "type": "User", "id": "director-1" },
+    "attrs": { "role": "Director", "teamId": "team-a" },
+    "parents": [{ "type": "Role", "id": "Director" }]
+  },
+  "Principal": {
+    "uid": { "type": "User", "id": "principal-1" },
+    "attrs": { "role": "Principal", "teamId": "team-a" },
+    "parents": [{ "type": "Role", "id": "Principal" }]
+  },
+  "Associate": {
+    "uid": { "type": "User", "id": "associate-1" },
+    "attrs": { "role": "Associate", "teamId": "team-b" },
+    "parents": [{ "type": "Role", "id": "Associate" }]
+  },
+  "Intern": {
+    "uid": { "type": "User", "id": "intern-1" },
+    "attrs": { "role": "Intern", "teamId": "team-b" },
+    "parents": [{ "type": "Role", "id": "Intern" }]
+  },
+  "Admin": {
+    "uid": { "type": "User", "id": "admin-1" },
+    "attrs": { "role": "Admin", "teamId": "team-ops" },
+    "parents": [{ "type": "Role", "id": "Admin" }]
+  }
+}
