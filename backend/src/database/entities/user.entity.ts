@@ -5,18 +5,21 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { UserRole } from '../enums';
+import { UserRole, UserStatus } from '../enums';
 
 @Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
+  @Column({ name: 'auth0_sub', type: 'varchar', length: 255, unique: true })
+  auth0Sub!: string;
+
   @Column({ type: 'varchar', length: 255, unique: true })
   email!: string;
 
-  @Column({ name: 'full_name', type: 'varchar', length: 255 })
-  fullName!: string;
+  @Column({ name: 'display_name', type: 'varchar', length: 255 })
+  displayName!: string;
 
   @Column({ type: 'enum', enum: UserRole, enumName: 'user_role' })
   role!: UserRole;
@@ -24,8 +27,13 @@ export class User {
   @Column({ name: 'team_id', type: 'uuid', nullable: true })
   teamId!: string | null;
 
-  @Column({ name: 'auth0_subject', type: 'varchar', length: 255, nullable: true, unique: true })
-  auth0Subject!: string | null;
+  @Column({
+    type: 'enum',
+    enum: UserStatus,
+    enumName: 'user_status',
+    default: UserStatus.ACTIVE,
+  })
+  status!: UserStatus;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;
