@@ -138,3 +138,8 @@ variable "allowed_country_codes" {
   type        = list(string)
   default     = ["US"]
 }
+
+variable "cors_allowed_origins" {
+  type    = list(string)
+  default = ["https://app.dev.p7vc-crm.com"]
+}

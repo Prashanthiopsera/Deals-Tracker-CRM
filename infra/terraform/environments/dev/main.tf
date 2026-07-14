@@ -185,3 +185,13 @@ module "api_gateway" {
 
   common_tags = local.common_tags
 }
+
+module "s3" {
+  source = "../../modules/s3"
+
+  project_name         = var.project_name
+  environment          = var.environment
+  ecs_task_role_arn    = module.ecs.task_role_arn
+  cors_allowed_origins = var.cors_allowed_origins
+  common_tags          = local.common_tags
+}
