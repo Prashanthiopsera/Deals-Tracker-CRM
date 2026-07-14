@@ -70,9 +70,10 @@ describe('AuthorizationAuditService', () => {
     expect(repository.entries).toHaveLength(1);
     expect(repository.entries[0].metadata).toMatchObject({
       actor_role: 'Associate',
-      decision: 'allow',
+      cedar_policy_id: 'associate-read',
       source: 'api',
     });
+    expect(repository.entries[0].entityType).toBe('Contact');
   });
 
   it('records CloudWatch metric dimensions in memory publisher', async () => {

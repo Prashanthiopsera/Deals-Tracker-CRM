@@ -57,3 +57,27 @@ export enum CompanyStatus {
   ARCHIVED = 'Archived',
   PORTFOLIO = 'Portfolio',
 }
+
+export enum AuditAction {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  REASSIGN = 'reassign',
+  AI_RETRIEVAL = 'ai_retrieval',
+  AI_RESPONSE = 'ai_response',
+  LOGIN = 'login',
+  LOGOUT = 'logout',
+  PERMISSION_DENIED = 'permission_denied',
+}
+
+export enum UserStatus {
+  ACTIVE = 'active',
+  DEACTIVATED = 'deactivated',
+}
+
+export enum CommentRecordType {
+  COMPANY = 'company',
+  CONTACT = 'contact',
+  ACTIVITY = 'activity',
+  DOCUMENT = 'document',
+}
