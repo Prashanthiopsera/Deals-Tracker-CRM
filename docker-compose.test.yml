@@ -1,0 +1,23 @@
+services:
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/p7vc_crm
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: p7vc_crm
+    volumes:
+      - ./backend/scripts/seed-test-db.sql:/docker-entrypoint-initdb.d/01-seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d p7vc_crm"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
