@@ -254,3 +254,10 @@ module "redis" {
   num_cache_clusters    = var.redis_num_cache_clusters
   common_tags           = local.common_tags
 }
+
+module "verified_permissions" {
+  source = "../../modules/verified-permissions"
+
+  project_name = var.project_name
+  environment  = var.environment
+}

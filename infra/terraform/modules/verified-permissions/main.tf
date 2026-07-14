@@ -32,6 +32,53 @@ resource "aws_verifiedpermissions_policy" "rbac" {
   }
 }
 
+resource "aws_iam_policy" "ecs_is_authorized" {
+  name = "${local.name_prefix}-verified-permissions"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "verifiedpermissions:IsAuthorized",
+          "verifiedpermissions:IsAuthorizedWithToken"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_cloudwatch_metric_alarm" "avp_errors" {
+  alarm_name          = "${local.name_prefix}-avp-errors"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "UserErrorCount"
+  namespace           = "AWS/VerifiedPermissions"
+  period              = 300
+  statistic           = "Sum"
+  threshold           = 1
+  alarm_description   = "Verified Permissions error rate above 1%"
+  treat_missing_data  = "notBreaching"
+}
+
+resource "aws_cloudwatch_metric_alarm" "avp_latency" {
+  alarm_name          = "${local.name_prefix}-avp-latency"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 3
+  metric_name         = "Latency"
+  namespace           = "AWS/VerifiedPermissions"
+  period              = 60
+  extended_statistic  = "p99"
+  threshold           = 100
+  alarm_description   = "Verified Permissions p99 latency above 100ms"
+  treat_missing_data  = "notBreaching"
+}
+
 output "policy_store_id" {
   value = aws_verifiedpermissions_policy_store.this.policy_store_id
+}
+
+output "ecs_is_authorized_policy_arn" {
+  value = aws_iam_policy.ecs_is_authorized.arn
 }
