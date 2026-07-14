@@ -175,3 +175,9 @@ variable "create_github_oidc_provider" {
   type        = bool
   default     = true
 }
+
+variable "redis_num_cache_clusters" {
+  description = "Number of Redis cache clusters (minimum 2 for multi-AZ failover)."
+  type        = number
+  default     = 2
+}

@@ -88,3 +88,72 @@ module "api_gateway" {
 
   common_tags = local.common_tags
 }
+
+module "s3" {
+  source = "../../modules/s3"
+
+  project_name         = var.project_name
+  environment          = var.environment
+  ecs_task_role_arn    = module.ecs.task_role_arn
+  cors_allowed_origins = var.cors_allowed_origins
+  common_tags          = local.common_tags
+}
+
+module "secrets" {
+  source = "../../modules/secrets"
+
+  project_name         = var.project_name
+  environment          = var.environment
+  ecs_task_role_arn    = module.ecs.task_role_arn
+  api_base_url         = var.api_base_url
+  auth0_domain         = var.auth0_domain
+  auth0_audience       = var.auth0_audience
+  cors_allowed_origins = var.cors_allowed_origins
+  common_tags          = local.common_tags
+}
+
+module "messaging" {
+  source = "../../modules/messaging"
+
+  project_name      = var.project_name
+  environment       = var.environment
+  ecs_task_role_arn = module.ecs.task_role_arn
+  common_tags       = local.common_tags
+}
+
+module "observability" {
+  source = "../../modules/observability"
+
+  project_name      = var.project_name
+  environment       = var.environment
+  aws_region        = var.aws_region
+  ecs_cluster_name  = module.ecs.cluster_name
+  ecs_service_name  = module.ecs.service_name
+  ecs_desired_count = var.ecs_desired_count
+  api_gateway_id    = module.api_gateway.api_id
+  ops_alert_email   = var.ops_alert_email
+  common_tags       = local.common_tags
+}
+
+module "ecr" {
+  source = "../../modules/ecr"
+
+  project_name                = var.project_name
+  environment                 = var.environment
+  aws_region                  = var.aws_region
+  github_repository           = var.github_repository
+  create_github_oidc_provider = var.create_github_oidc_provider
+  common_tags                 = local.common_tags
+}
+
+module "redis" {
+  source = "../../modules/redis"
+
+  project_name           = var.project_name
+  environment            = var.environment
+  vpc_id                 = module.vpc.vpc_id
+  private_subnet_ids     = module.vpc.private_subnet_ids
+  ecs_security_group_id  = module.ecs.ecs_security_group_id
+  num_cache_clusters     = var.redis_num_cache_clusters
+  common_tags            = local.common_tags
+}

@@ -135,3 +135,43 @@ variable "allowed_country_codes" {
   type    = list(string)
   default = ["US"]
 }
+
+variable "cors_allowed_origins" {
+  type    = list(string)
+  default = ["https://app.p7vc-crm.com"]
+}
+
+variable "api_base_url" {
+  type    = string
+  default = "https://api.p7vc-crm.com"
+}
+
+variable "auth0_domain" {
+  type    = string
+  default = "p7vc.auth0.com"
+}
+
+variable "auth0_audience" {
+  type    = string
+  default = "https://api.p7vc-crm.com"
+}
+
+variable "ops_alert_email" {
+  type    = string
+  default = ""
+}
+
+variable "github_repository" {
+  type    = string
+  default = "Prashanthiopsera/Deals-Tracker-CRM"
+}
+
+variable "create_github_oidc_provider" {
+  type    = bool
+  default = false
+}
+
+variable "redis_num_cache_clusters" {
+  type    = number
+  default = 2
+}

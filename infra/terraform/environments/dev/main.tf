@@ -242,3 +242,15 @@ module "ecr" {
   create_github_oidc_provider = var.create_github_oidc_provider
   common_tags                 = local.common_tags
 }
+
+module "redis" {
+  source = "../../modules/redis"
+
+  project_name          = var.project_name
+  environment           = var.environment
+  vpc_id                = module.vpc.vpc_id
+  private_subnet_ids    = module.vpc.private_subnet_ids
+  ecs_security_group_id = module.ecs.ecs_security_group_id
+  num_cache_clusters    = var.redis_num_cache_clusters
+  common_tags           = local.common_tags
+}
