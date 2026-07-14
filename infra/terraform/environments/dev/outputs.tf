@@ -82,3 +82,8 @@ output "alb_dns_name" {
   description = "Application Load Balancer DNS name."
   value       = module.ecs.alb_dns_name
 }
+
+output "api_gateway_endpoint" {
+  description = "API Gateway invoke URL."
+  value       = module.api_gateway.api_endpoint
+}

@@ -69,3 +69,22 @@ module "ecs" {
 
   common_tags = local.common_tags
 }
+
+module "api_gateway" {
+  source = "../../modules/api-gateway"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  vpc_id                = module.vpc.vpc_id
+  private_subnet_ids    = module.vpc.private_subnet_ids
+  alb_arn               = module.ecs.alb_arn
+  alb_security_group_id = module.ecs.alb_security_group_id
+  target_group_arn      = module.ecs.target_group_arn
+
+  api_domain_name       = var.api_domain_name
+  route53_zone_id       = var.route53_zone_id
+  allowed_country_codes = var.allowed_country_codes
+
+  common_tags = local.common_tags
+}

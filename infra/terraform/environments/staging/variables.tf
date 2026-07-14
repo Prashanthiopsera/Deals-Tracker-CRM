@@ -120,3 +120,18 @@ variable "ecs_container_image" {
   type        = string
   default     = "public.ecr.aws/docker/library/nginx:stable-alpine"
 }
+
+variable "api_domain_name" {
+  type    = string
+  default = "api.staging.p7vc-crm.com"
+}
+
+variable "route53_zone_id" {
+  type    = string
+  default = ""
+}
+
+variable "allowed_country_codes" {
+  type    = list(string)
+  default = ["US"]
+}
