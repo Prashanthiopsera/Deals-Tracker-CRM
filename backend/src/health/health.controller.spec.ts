@@ -25,4 +25,15 @@ describe('HealthController', () => {
     const controller = moduleRef.get(HealthController);
     expect(() => controller.getReadiness()).toThrow(ServiceUnavailableException);
   });
+
+  it('returns readiness when database is available', async () => {
+    process.env.DATABASE_URL = 'postgres://localhost/test';
+    const moduleRef = await Test.createTestingModule({
+      controllers: [HealthController],
+      providers: [HealthService],
+    }).compile();
+
+    const controller = moduleRef.get(HealthController);
+    expect(controller.getReadiness().ready).toBe(true);
+  });
 });

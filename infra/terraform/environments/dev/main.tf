@@ -208,3 +208,37 @@ module "secrets" {
   cors_allowed_origins = var.cors_allowed_origins
   common_tags          = local.common_tags
 }
+
+module "messaging" {
+  source = "../../modules/messaging"
+
+  project_name      = var.project_name
+  environment       = var.environment
+  ecs_task_role_arn = module.ecs.task_role_arn
+  common_tags       = local.common_tags
+}
+
+module "observability" {
+  source = "../../modules/observability"
+
+  project_name      = var.project_name
+  environment       = var.environment
+  aws_region        = var.aws_region
+  ecs_cluster_name  = module.ecs.cluster_name
+  ecs_service_name  = module.ecs.service_name
+  ecs_desired_count = var.ecs_desired_count
+  api_gateway_id    = module.api_gateway.api_id
+  ops_alert_email   = var.ops_alert_email
+  common_tags       = local.common_tags
+}
+
+module "ecr" {
+  source = "../../modules/ecr"
+
+  project_name                = var.project_name
+  environment                 = var.environment
+  aws_region                  = var.aws_region
+  github_repository           = var.github_repository
+  create_github_oidc_provider = var.create_github_oidc_provider
+  common_tags                 = local.common_tags
+}

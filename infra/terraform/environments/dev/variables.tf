@@ -163,3 +163,15 @@ variable "ops_alert_email" {
   type    = string
   default = ""
 }
+
+variable "github_repository" {
+  description = "GitHub repo trusted for OIDC (owner/name)."
+  type        = string
+  default     = "Prashanthiopsera/Deals-Tracker-CRM"
+}
+
+variable "create_github_oidc_provider" {
+  description = "Create GitHub OIDC provider in AWS (once per account)."
+  type        = bool
+  default     = true
+}

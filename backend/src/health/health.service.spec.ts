@@ -31,4 +31,12 @@ describe('HealthService', () => {
     const service = new HealthService();
     expect(service.readiness().ready).toBe(false);
   });
+
+  it('skips database check when DATABASE_CHECK=skip', () => {
+    delete process.env.DATABASE_URL;
+    process.env.DATABASE_CHECK = 'skip';
+    const service = new HealthService();
+    expect(service.check().database).toBe('connected');
+    expect(service.readiness().ready).toBe(true);
+  });
 });

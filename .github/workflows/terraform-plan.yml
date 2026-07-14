@@ -1,0 +1,58 @@
+name: Terraform Plan
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'infra/terraform/**'
+      - '.github/workflows/terraform-plan.yml'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [dev, staging, prod]
+    defaults:
+      run:
+        working-directory: infra/terraform/environments/${{ matrix.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Terraform fmt check
+        run: |
+          docker run --rm -v "${{ github.workspace }}/infra/terraform:/tf" hashicorp/terraform:1.5 \
+            fmt -check -recursive /tf
+
+      - name: Terraform init
+        run: |
+          docker run --rm -v "${{ github.workspace }}/infra/terraform:/tf" -w /tf/environments/${{ matrix.environment }} hashicorp/terraform:1.5 \
+            init -backend=false
+
+      - name: Terraform validate
+        run: |
+          docker run --rm -v "${{ github.workspace }}/infra/terraform:/tf" -w /tf/environments/${{ matrix.environment }} hashicorp/terraform:1.5 \
+            validate
+
+      - name: Terraform plan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+        run: |
+          docker run --rm \
+            -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_REGION \
+            -v "${{ github.workspace }}/infra/terraform:/tf" \
+            -w /tf/environments/${{ matrix.environment }} \
+            hashicorp/terraform:1.5 plan -input=false -no-color \
+            | tee plan.txt
+
+      - name: Upload plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan-${{ matrix.environment }}-${{ github.sha }}
+          path: infra/terraform/environments/${{ matrix.environment }}/plan.txt
