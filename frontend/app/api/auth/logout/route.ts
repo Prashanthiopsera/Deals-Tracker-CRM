@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authConfig } from '@/lib/auth-config';
-import { deleteRefreshToken } from '@/lib/redis-session';
+import { sessionStore } from '@/lib/session-store';
 
 export async function GET(request: NextRequest) {
   const sessionId = request.cookies.get('p7vc_session')?.value;
   const { domain, clientId, baseUrl } = authConfig();
 
   if (sessionId) {
-    await deleteRefreshToken(sessionId);
+    await sessionStore.revoke(sessionId);
   }
 
   const params = new URLSearchParams({

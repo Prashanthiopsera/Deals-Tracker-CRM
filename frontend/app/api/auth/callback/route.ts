@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authConfig, createSessionCookie, newSessionId } from '@/lib/auth-config';
-import { storeRefreshToken } from '@/lib/redis-session';
+import { sessionStore } from '@/lib/session-store';
 
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get('code');
@@ -33,7 +33,15 @@ export async function GET(request: NextRequest) {
 
   const sessionId = newSessionId();
   if (tokens.refresh_token) {
-    await storeRefreshToken(sessionId, tokens.refresh_token);
+    await sessionStore.create({
+      sessionId,
+      userId: 'pending-auth0-sync',
+      role: 'Unknown',
+      refreshToken: tokens.refresh_token,
+      createdAt: new Date().toISOString(),
+      lastActivityAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
+    });
   }
 
   const response = NextResponse.redirect(`${baseUrl}/`);
