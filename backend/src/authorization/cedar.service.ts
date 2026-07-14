@@ -5,6 +5,7 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { CedarCache } from './cedar-cache';
+import { AuthorizationAuditService } from '../audit/authorization-audit.service';
 import {
   CedarAction,
   CedarAuthDecision,
@@ -67,15 +68,20 @@ export class CedarAuthorizationService {
   constructor(
     private readonly client: CedarPolicyClient,
     private readonly cache: CedarCache,
+    private readonly audit?: AuthorizationAuditService,
   ) {}
 
   async authorize(request: CedarAuthRequest): Promise<CedarAuthDecision> {
     const cacheKey = `${request.userId}:${request.action}:${request.resourceType}:${request.resourceId ?? '*'}`;
     const cached = await this.cache.get(cacheKey);
-    if (cached) return cached;
+    if (cached) {
+      this.audit?.publishDecisionAsync(request, cached);
+      return cached;
+    }
 
     const decision = await this.client.isAuthorized(request);
     await this.cache.set(cacheKey, decision);
+    this.audit?.publishDecisionAsync(request, decision);
     return decision;
   }
 

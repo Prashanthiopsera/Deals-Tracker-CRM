@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { AuditModule } from '../audit/audit.module';
+import { AuthorizationAuditService } from '../audit/authorization-audit.service';
 import { APP_GUARD } from '@nestjs/core';
 import {
   InMemoryCedarCache,
@@ -9,6 +11,7 @@ import { CedarGuard } from './cedar.guard';
 import { CedarAuthorizationService, VerifiedPermissionsClient } from './cedar.service';
 
 @Module({
+  imports: [AuditModule],
   providers: [
     InMemoryCedarCache,
     RedisCedarCache,
@@ -20,9 +23,12 @@ import { CedarAuthorizationService, VerifiedPermissionsClient } from './cedar.se
     VerifiedPermissionsClient,
     {
       provide: CedarAuthorizationService,
-      useFactory: (client: VerifiedPermissionsClient, cache: LayeredCedarCache) =>
-        new CedarAuthorizationService(client, cache),
-      inject: [VerifiedPermissionsClient, LayeredCedarCache],
+      useFactory: (
+        client: VerifiedPermissionsClient,
+        cache: LayeredCedarCache,
+        audit: AuthorizationAuditService,
+      ) => new CedarAuthorizationService(client, cache, audit),
+      inject: [VerifiedPermissionsClient, LayeredCedarCache, AuthorizationAuditService],
     },
     CedarGuard,
     {

@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AuthorizationAuditQueueMessage",
+  "type": "object",
+  "required": [
+    "eventId",
+    "actorId",
+    "actorRole",
+    "action",
+    "resourceType",
+    "decision",
+    "source",
+    "timestamp"
+  ],
+  "properties": {
+    "eventId": { "type": "string", "format": "uuid" },
+    "actorId": { "type": "string" },
+    "actorRole": { "type": "string" },
+    "action": { "type": "string" },
+    "resourceType": { "type": "string" },
+    "resourceId": { "type": "string" },
+    "decision": { "type": "string", "enum": ["allow", "deny"] },
+    "cedarPolicyId": { "type": "string" },
+    "source": { "type": "string", "enum": ["api", "mcp", "agent"] },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "requestMetadata": { "type": "object" }
+  }
+}

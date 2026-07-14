@@ -19,3 +19,9 @@ variable "common_tags" {
   type    = map(string)
   default = {}
 }
+
+variable "auth_denial_alarm_threshold" {
+  description = "Authorization denial count per minute before alarm fires."
+  type        = number
+  default     = 10
+}
