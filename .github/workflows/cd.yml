@@ -1,0 +1,118 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ startsWith(github.ref, 'refs/tags/v') && 'prod' || 'staging' }}
+    env:
+      DEPLOY_ENV: ${{ startsWith(github.ref, 'refs/tags/v') && 'prod' || 'staging' }}
+      ECR_REPOSITORY: p7vc-crm-${{ startsWith(github.ref, 'refs/tags/v') && 'prod' || 'staging' }}-api
+      ECS_CLUSTER: p7vc-crm-${{ startsWith(github.ref, 'refs/tags/v') && 'prod' || 'staging' }}-cluster
+      ECS_SERVICE: p7vc-crm-${{ startsWith(github.ref, 'refs/tags/v') && 'prod' || 'staging' }}-api
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker image
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          IMAGE_SHA: ${{ github.sha }}
+          IMAGE_TAG: ${{ github.ref_name }}
+        run: |
+          docker build -t $REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA .
+          docker push $REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            docker tag $REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+            docker push $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          fi
+          docker tag $REGISTRY/$ECR_REPOSITORY:$IMAGE_SHA $REGISTRY/$ECR_REPOSITORY:latest
+          docker push $REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Capture previous task definition
+        id: previous
+        run: |
+          PREV=$(aws ecs describe-services \
+            --cluster "$ECS_CLUSTER" \
+            --services "$ECS_SERVICE" \
+            --query 'services[0].taskDefinition' \
+            --output text)
+          echo "arn=$PREV" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy ECS service
+        id: deploy
+        env:
+          IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        run: |
+          TASK_FAMILY=$(aws ecs describe-services \
+            --cluster "$ECS_CLUSTER" \
+            --services "$ECS_SERVICE" \
+            --query 'services[0].taskDefinition' \
+            --output text | awk -F/ '{print $NF}' | awk -F: '{print $1}')
+          CURRENT=$(aws ecs describe-task-definition --task-definition "$TASK_FAMILY" --query 'taskDefinition')
+          NEW=$(echo "$CURRENT" | jq --arg IMAGE "$IMAGE" \
+            '.containerDefinitions[0].image = $IMAGE | del(.taskDefinitionArn,.revision,.status,.requiresAttributes,.compatibilities,.registeredAt,.registeredBy)')
+          NEW_ARN=$(aws ecs register-task-definition --cli-input-json "$NEW" \
+            --query 'taskDefinition.taskDefinitionArn' --output text)
+          aws ecs update-service \
+            --cluster "$ECS_CLUSTER" \
+            --service "$ECS_SERVICE" \
+            --task-definition "$NEW_ARN" \
+            --force-new-deployment \
+            --query 'service.deployments[0].id' --output text | tee deploy-id.txt
+          echo "task_definition=$NEW_ARN" >> "$GITHUB_OUTPUT"
+          echo "Deploying commit ${{ github.sha }} to $DEPLOY_ENV at $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+      - name: Wait for service stability
+        id: stable
+        continue-on-error: true
+        run: |
+          timeout 600 aws ecs wait services-stable \
+            --cluster "$ECS_CLUSTER" \
+            --services "$ECS_SERVICE"
+
+      - name: Rollback on failure
+        if: steps.stable.outcome == 'failure'
+        run: |
+          echo "Service did not stabilize — rolling back to ${{ steps.previous.outputs.arn }}"
+          aws ecs update-service \
+            --cluster "$ECS_CLUSTER" \
+            --service "$ECS_SERVICE" \
+            --task-definition "${{ steps.previous.outputs.arn }}" \
+            --force-new-deployment
+          exit 1
+
+      - name: Post-deployment health check
+        if: steps.stable.outcome == 'success'
+        env:
+          API_URL: ${{ env.DEPLOY_ENV == 'staging' && secrets.STAGING_API_URL || secrets.PROD_API_URL }}
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf "$API_URL/api/health"; then
+              echo "Health check passed for ${{ github.sha }}"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Health check failed"
+          exit 1
