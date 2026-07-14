@@ -1,15 +1,24 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
+  NotFoundException,
   Param,
   Patch,
   Post,
+  Query,
+  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { AuthUserContext } from '../auth/auth.types';
+import { CreateCompanyDto, ListCompaniesQueryDto, UpdateCompanyDto, validateCreateCompanyDto } from './companies.dto';
 import { CompaniesService } from './companies.service';
 import { OwnershipFieldInterceptor } from './ownership-field.interceptor';
 import { OwnershipPatchGuard } from './ownership-patch.guard';
@@ -21,32 +30,62 @@ export class CompaniesController {
   constructor(private readonly companies: CompaniesService) {}
 
   @Get()
-  list() {
-    return this.companies.list();
+  list(@Query() query: ListCompaniesQueryDto) {
+    return this.companies.list(query);
   }
 
   @Get(':id')
-  get(@Param('id') id: string) {
-    return this.companies.getById(id);
+  async get(@Param('id') id: string) {
+    try {
+      return await this.companies.getById(id);
+    } catch {
+      throw new NotFoundException({ message: 'Company not found' });
+    }
   }
 
   @Post()
-  create(@Body() body: { name: string }) {
-    return this.companies.create(body.name);
-  }
-
-  @Delete(':id')
-  delete(@Param('id') id: string) {
-    return this.companies.delete(id);
+  @HttpCode(HttpStatus.CREATED)
+  async create(
+    @Body() body: CreateCompanyDto,
+    @Req() req: Request & { user: AuthUserContext },
+  ) {
+    try {
+      validateCreateCompanyDto(body as unknown as Record<string, unknown>);
+    } catch (error) {
+      throw new BadRequestException({ message: String(error) });
+    }
+    return this.companies.create(body, req.user.p7vcUserId);
   }
 
   @Patch(':id/owner')
-  reassign(@Param('id') id: string, @Body() body: Record<string, unknown>) {
-    return this.companies.patch(id, body);
+  reassign(
+    @Param('id') id: string,
+    @Body() body: UpdateCompanyDto,
+    @Req() req: Request & { user: AuthUserContext },
+  ) {
+    return this.patch(id, body, req);
   }
 
   @Patch(':id')
-  patch(@Param('id') id: string, @Body() body: Record<string, unknown>) {
-    return this.companies.patch(id, body);
+  async patch(
+    @Param('id') id: string,
+    @Body() body: UpdateCompanyDto,
+    @Req() req: Request & { user: AuthUserContext },
+  ) {
+    try {
+      return await this.companies.patch(id, body, req.user.p7vcUserId);
+    } catch {
+      throw new NotFoundException({ message: 'Company not found' });
+    }
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async delete(@Param('id') id: string, @Req() req: Request & { user: AuthUserContext }) {
+    try {
+      await this.companies.softDelete(id, req.user.p7vcUserId);
+    } catch {
+      throw new NotFoundException({ message: 'Company not found' });
+    }
   }
 }

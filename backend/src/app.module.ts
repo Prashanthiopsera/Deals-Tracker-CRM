@@ -5,11 +5,13 @@ import { AuthModule } from './auth/auth.module';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { AuditModule } from './audit/audit.module';
 import { AdminModule } from './admin/admin.module';
+import { DatabaseModule } from './database/database.module';
 import { CompaniesModule } from './companies/companies.module';
 
 @Module({
   imports: [
     ObservabilityModule,
+    DatabaseModule,
     AuthModule,
     AuditModule,
     AuthorizationModule,
