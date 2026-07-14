@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { DataSource, DataSourceOptions } from 'typeorm';
+import { Comment } from './entities/comment.entity';
 import { User } from './entities/user.entity';
 import { Activity } from './entities/activity.entity';
 import { Contact } from './entities/contact.entity';
@@ -16,7 +17,7 @@ export function buildDataSourceOptions(): DataSourceOptions {
   return {
     type: 'postgres',
     url,
-    entities: [User, Company, Contact, Activity, Document, AuditLog],
+    entities: [User, Company, Contact, Activity, Document, AuditLog, Comment],
     migrations: [`${__dirname}/migrations/*.{ts,js}`],
     synchronize: false,
     logging: process.env.TYPEORM_LOGGING === 'true',
