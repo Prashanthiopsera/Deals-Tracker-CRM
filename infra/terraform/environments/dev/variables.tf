@@ -143,3 +143,23 @@ variable "cors_allowed_origins" {
   type    = list(string)
   default = ["https://app.dev.p7vc-crm.com"]
 }
+
+variable "api_base_url" {
+  type    = string
+  default = "https://api.dev.p7vc-crm.com"
+}
+
+variable "auth0_domain" {
+  type    = string
+  default = "p7vc.auth0.com"
+}
+
+variable "auth0_audience" {
+  type    = string
+  default = "https://api.p7vc-crm.com"
+}
+
+variable "ops_alert_email" {
+  type    = string
+  default = ""
+}

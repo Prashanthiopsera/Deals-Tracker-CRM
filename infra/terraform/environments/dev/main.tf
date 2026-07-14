@@ -195,3 +195,16 @@ module "s3" {
   cors_allowed_origins = var.cors_allowed_origins
   common_tags          = local.common_tags
 }
+
+module "secrets" {
+  source = "../../modules/secrets"
+
+  project_name         = var.project_name
+  environment          = var.environment
+  ecs_task_role_arn    = module.ecs.task_role_arn
+  api_base_url         = var.api_base_url
+  auth0_domain         = var.auth0_domain
+  auth0_audience       = var.auth0_audience
+  cors_allowed_origins = var.cors_allowed_origins
+  common_tags          = local.common_tags
+}
