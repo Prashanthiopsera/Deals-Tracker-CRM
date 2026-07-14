@@ -1,3 +1,4 @@
+import { Reflector } from '@nestjs/core';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { JwtStrategy } from './jwt.strategy';
 import { Test } from '@nestjs/testing';
@@ -6,11 +7,13 @@ import { UnauthorizedException } from '@nestjs/common';
 describe('JwtAuthGuard', () => {
   it('allows bypass mode for tests', () => {
     process.env.AUTH_BYPASS = 'true';
-    const guard = new JwtAuthGuard();
+    const guard = new JwtAuthGuard(new Reflector());
     const context = {
       switchToHttp: () => ({
-        getRequest: () => ({}),
+        getRequest: () => ({ path: '/api/companies' }),
       }),
+      getHandler: () => ({}),
+      getClass: () => ({}),
     };
     expect(guard.canActivate(context as never)).toBe(true);
     delete process.env.AUTH_BYPASS;

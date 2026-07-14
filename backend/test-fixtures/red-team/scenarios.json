@@ -1,0 +1,41 @@
+{
+  "companyId": "11111111-1111-1111-1111-111111111111",
+  "users": {
+    "Director": "00000000-0000-0000-0000-000000000001",
+    "Principal": "00000000-0000-0000-0000-000000000002",
+    "Associate": "00000000-0000-0000-0000-000000000003",
+    "Intern": "00000000-0000-0000-0000-000000000004"
+  },
+  "scenarios": [
+    { "id": "director-list-companies", "role": "Director", "method": "GET", "path": "/api/companies", "expectedStatus": 200 },
+    { "id": "principal-list-companies", "role": "Principal", "method": "GET", "path": "/api/companies", "expectedStatus": 200 },
+    { "id": "associate-list-companies", "role": "Associate", "method": "GET", "path": "/api/companies", "expectedStatus": 200 },
+    { "id": "intern-list-companies", "role": "Intern", "method": "GET", "path": "/api/companies", "expectedStatus": 200, "assertNoOwnershipFields": true },
+    { "id": "director-get-company", "role": "Director", "method": "GET", "path": "/api/companies/{{companyId}}", "expectedStatus": 200, "assertHasOwnershipFields": true },
+    { "id": "intern-get-company", "role": "Intern", "method": "GET", "path": "/api/companies/{{companyId}}", "expectedStatus": 200, "assertNoOwnershipFields": true },
+    { "id": "intern-create-company", "role": "Intern", "method": "POST", "path": "/api/companies", "body": { "name": "Blocked Co" }, "expectedStatus": 403 },
+    { "id": "associate-create-company", "role": "Associate", "method": "POST", "path": "/api/companies", "body": { "name": "Associate Co" }, "expectedStatus": 201 },
+    { "id": "principal-create-company", "role": "Principal", "method": "POST", "path": "/api/companies", "body": { "name": "Principal Co" }, "expectedStatus": 201 },
+    { "id": "director-create-company", "role": "Director", "method": "POST", "path": "/api/companies", "body": { "name": "Director Co" }, "expectedStatus": 201 },
+    { "id": "intern-delete-company", "role": "Intern", "method": "DELETE", "path": "/api/companies/{{companyId}}", "expectedStatus": 403 },
+    { "id": "associate-delete-company", "role": "Associate", "method": "DELETE", "path": "/api/companies/{{companyId}}", "expectedStatus": 403 },
+    { "id": "principal-delete-company", "role": "Principal", "method": "DELETE", "path": "/api/companies/{{companyId}}", "expectedStatus": 403 },
+    { "id": "director-delete-company", "role": "Director", "method": "DELETE", "path": "/api/companies/{{companyId}}", "expectedStatus": 200, "resetAfter": true },
+    { "id": "intern-patch-ownership", "role": "Intern", "method": "PATCH", "path": "/api/companies/{{companyId}}", "body": { "deal_lead_id": "99999999-9999-9999-9999-999999999999" }, "expectedStatus": 403 },
+    { "id": "associate-patch-ownership", "role": "Associate", "method": "PATCH", "path": "/api/companies/{{companyId}}", "body": { "deal_lead_id": "99999999-9999-9999-9999-999999999999" }, "expectedStatus": 403 },
+    { "id": "principal-patch-ownership", "role": "Principal", "method": "PATCH", "path": "/api/companies/{{companyId}}", "body": { "deal_lead_id": "99999999-9999-9999-9999-999999999999" }, "expectedStatus": 200 },
+    { "id": "director-patch-ownership", "role": "Director", "method": "PATCH", "path": "/api/companies/{{companyId}}", "body": { "deal_lead_id": "99999999-9999-9999-9999-999999999999" }, "expectedStatus": 200 },
+    { "id": "intern-patch-notes", "role": "Intern", "method": "PATCH", "path": "/api/companies/{{companyId}}", "body": { "notes": "intern update" }, "expectedStatus": 200 },
+    { "id": "associate-reassign-denied", "role": "Associate", "method": "PATCH", "path": "/api/companies/{{companyId}}/owner", "body": { "deal_lead_id": "99999999-9999-9999-9999-999999999999" }, "expectedStatus": 403 },
+    { "id": "intern-reassign-denied", "role": "Intern", "method": "PATCH", "path": "/api/companies/{{companyId}}/owner", "body": { "deal_lead_id": "99999999-9999-9999-9999-999999999999" }, "expectedStatus": 403 },
+    { "id": "principal-reassign-allowed", "role": "Principal", "method": "PATCH", "path": "/api/companies/{{companyId}}/owner", "body": { "deal_lead_id": "88888888-8888-8888-8888-888888888888" }, "expectedStatus": 200 },
+    { "id": "director-reassign-allowed", "role": "Director", "method": "PATCH", "path": "/api/companies/{{companyId}}/owner", "body": { "deal_lead_id": "77777777-7777-7777-7777-777777777777" }, "expectedStatus": 200 },
+    { "id": "intern-nested-ownership-patch", "role": "Intern", "method": "PATCH", "path": "/api/companies/{{companyId}}", "body": { "metadata": { "deal_lead_id": "nested" } }, "expectedStatus": 403 },
+    { "id": "intern-mixed-bulk-patch", "role": "Intern", "method": "PATCH", "path": "/api/companies/{{companyId}}", "body": { "notes": "ok", "support1_id": "bad" }, "expectedStatus": 403 },
+    { "id": "associate-mixed-bulk-patch", "role": "Associate", "method": "PATCH", "path": "/api/companies/{{companyId}}", "body": { "notes": "ok", "support2_id": "bad" }, "expectedStatus": 403 },
+    { "id": "director-admin-users-read", "role": "Director", "method": "GET", "path": "/api/admin/users", "expectedStatus": 200 },
+    { "id": "intern-admin-users-read", "role": "Intern", "method": "GET", "path": "/api/admin/users", "expectedStatus": 200 },
+    { "id": "intern-admin-invite-denied", "role": "Intern", "method": "POST", "path": "/api/admin/users", "body": { "email": "x@test.com", "fullName": "X", "role": "Intern" }, "expectedStatus": 403 },
+    { "id": "associate-admin-invite-allowed", "role": "Associate", "method": "POST", "path": "/api/admin/users", "body": { "email": "assoc@test.com", "fullName": "Assoc", "role": "Intern" }, "expectedStatus": 201 }
+  ]
+}
