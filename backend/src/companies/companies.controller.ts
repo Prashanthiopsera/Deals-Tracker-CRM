@@ -22,11 +22,13 @@ import { CedarAuthorize } from '../authorization/cedar.guard';
 import {
   CreateCompanyDto,
   ListCompaniesQueryDto,
+  ReassignOwnerDto,
   StageTransitionDto,
   UpdateCompanyDto,
   validateCreateCompanyDto,
 } from './companies.dto';
 import { CompaniesService } from './companies.service';
+import { CompanyOwnershipService } from './company-ownership.service';
 import { OwnershipFieldInterceptor } from './ownership-field.interceptor';
 import { OwnershipPatchGuard } from './ownership-patch.guard';
 
@@ -34,7 +36,10 @@ import { OwnershipPatchGuard } from './ownership-patch.guard';
 @UseGuards(JwtAuthGuard, OwnershipPatchGuard)
 @UseInterceptors(OwnershipFieldInterceptor)
 export class CompaniesController {
-  constructor(private readonly companies: CompaniesService) {}
+  constructor(
+    private readonly companies: CompaniesService,
+    private readonly ownership: CompanyOwnershipService,
+  ) {}
 
   @Get()
   list(@Query() query: ListCompaniesQueryDto) {
@@ -85,12 +90,19 @@ export class CompaniesController {
   }
 
   @Patch(':id/owner')
-  reassign(
+  @CedarAuthorize('reassign', 'Company')
+  async reassign(
     @Param('id') id: string,
-    @Body() body: UpdateCompanyDto,
+    @Body() body: ReassignOwnerDto,
     @Req() req: Request & { user: AuthUserContext },
   ) {
-    return this.patch(id, body, req);
+    await this.ownership.validateTargets(body);
+    try {
+      return await this.companies.reassignOwner(id, body, req.user.p7vcUserId, req.user.p7vcRole);
+    } catch (error) {
+      if (error instanceof BadRequestException) throw error;
+      throw new NotFoundException({ message: 'Company not found' });
+    }
   }
 
   @Patch(':id')

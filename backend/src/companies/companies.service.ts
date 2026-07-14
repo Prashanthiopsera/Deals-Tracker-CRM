@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { InMemoryAuditQueuePublisher } from '../audit/authorization-audit.publisher';
 import { Company } from '../database/entities/company.entity';
 import { CompanyStatus, DealStage } from '../database/enums';
-import { CreateCompanyDto, ListCompaniesQueryDto, UpdateCompanyDto } from './companies.dto';
+import { CreateCompanyDto, ListCompaniesQueryDto, ReassignOwnerDto, UpdateCompanyDto } from './companies.dto';
 import { toCompanyResponse } from './ownership-fields';
 import { validateStageTransition, stageDateKey } from './stage-transitions';
 
@@ -13,7 +13,7 @@ export interface CompanyAuditPublisher {
   publishCompanyEvent(input: {
     actorId: string;
     actorRole: string;
-    action: 'create' | 'update' | 'delete' | 'stage_transition';
+    action: 'create' | 'update' | 'delete' | 'stage_transition' | 'ownership_reassignment';
     before?: Record<string, unknown> | null;
     after?: Record<string, unknown> | null;
     companyId: string;
@@ -27,7 +27,7 @@ export class SqsCompanyAuditPublisher implements CompanyAuditPublisher {
   publishCompanyEvent(input: {
     actorId: string;
     actorRole: string;
-    action: 'create' | 'update' | 'delete' | 'stage_transition';
+    action: 'create' | 'update' | 'delete' | 'stage_transition' | 'ownership_reassignment';
     before?: Record<string, unknown> | null;
     after?: Record<string, unknown> | null;
     companyId: string;
@@ -133,6 +133,30 @@ export class CompaniesService {
       actorId,
       actorRole,
       action: 'stage_transition',
+      before,
+      after,
+      companyId: id,
+    });
+    return after;
+  }
+
+  async reassignOwner(
+    id: string,
+    dto: ReassignOwnerDto,
+    actorId: string,
+    actorRole: string,
+  ): Promise<Record<string, unknown>> {
+    const company = await this.findActive(id);
+    const before = this.toResponse(company);
+    if (dto.deal_lead_user_id !== undefined) company.dealLeadId = dto.deal_lead_user_id;
+    if (dto.deal_support_1_user_id !== undefined) company.support1Id = dto.deal_support_1_user_id;
+    if (dto.deal_support_2_user_id !== undefined) company.support2Id = dto.deal_support_2_user_id;
+    const saved = await this.companies.save(company);
+    const after = this.toResponse(saved);
+    this.audit.publishCompanyEvent({
+      actorId,
+      actorRole,
+      action: 'ownership_reassignment',
       before,
       after,
       companyId: id,

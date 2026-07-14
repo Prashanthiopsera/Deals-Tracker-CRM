@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { AuditModule } from '../audit/audit.module';
 import { InMemoryAuditQueuePublisher } from '../audit/authorization-audit.publisher';
 import { Company } from '../database/entities/company.entity';
+import { User } from '../database/entities/user.entity';
+import { CompanyOwnershipService } from './company-ownership.service';
 import { CompaniesController } from './companies.controller';
 import { CompaniesInMemoryService } from './companies-in-memory.service';
 import { CompaniesService, SqsCompanyAuditPublisher } from './companies.service';
@@ -11,10 +13,11 @@ import { OwnershipFieldInterceptor } from './ownership-field.interceptor';
 import { OwnershipPatchGuard } from './ownership-patch.guard';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Company]), AuditModule],
+  imports: [TypeOrmModule.forFeature([Company, User]), AuditModule],
   controllers: [CompaniesController],
   providers: [
     CompaniesInMemoryService,
+    CompanyOwnershipService,
     OwnershipFieldInterceptor,
     OwnershipPatchGuard,
     {

@@ -142,6 +142,23 @@ export class CompaniesInMemoryService {
     return after;
   }
 
+  async reassignOwner(
+    id: string,
+    dto: import('./companies.dto').ReassignOwnerDto,
+    actorId: string,
+    actorRole: string,
+  ) {
+    const company = this.findActive(id);
+    const before = this.toResponse(company);
+    if (dto.deal_lead_user_id !== undefined) company.dealLeadId = dto.deal_lead_user_id;
+    if (dto.deal_support_1_user_id !== undefined) company.support1Id = dto.deal_support_1_user_id;
+    if (dto.deal_support_2_user_id !== undefined) company.support2Id = dto.deal_support_2_user_id;
+    company.updatedAt = new Date();
+    const after = this.toResponse(company);
+    this.publishAudit(actorId, actorRole, 'ownership_reassignment', before, after, id);
+    return after;
+  }
+
   private findActive(id: string): MemoryCompany {
     const company = this.companies.find((c) => c.id === id);
     if (!company || company.deletedAt) {
@@ -172,7 +189,7 @@ export class CompaniesInMemoryService {
   private publishAudit(
     actorId: string,
     actorRole: string,
-    action: 'create' | 'update' | 'delete' | 'stage_transition',
+    action: 'create' | 'update' | 'delete' | 'stage_transition' | 'ownership_reassignment',
     before: Record<string, unknown> | null,
     after: Record<string, unknown> | null,
     companyId: string,

@@ -67,6 +67,20 @@ export class StageTransitionDto {
   deal_stage!: DealStage;
 }
 
+export class ReassignOwnerDto {
+  @IsOptional()
+  @IsString()
+  deal_lead_user_id?: string;
+
+  @IsOptional()
+  @IsString()
+  deal_support_1_user_id?: string;
+
+  @IsOptional()
+  @IsString()
+  deal_support_2_user_id?: string;
+}
+
 export class ListCompaniesQueryDto {
   @IsOptional()
   page?: number = 1;

@@ -1,7 +1,10 @@
 export const OWNERSHIP_FIELD_KEYS = [
   'deal_lead_id',
+  'deal_lead_user_id',
   'support1_id',
   'support2_id',
+  'deal_support_1_user_id',
+  'deal_support_2_user_id',
   'p7vc_deal_lead',
   'deal_lead_support_1',
   'deal_lead_support_2',
