@@ -54,3 +54,33 @@ variable "vpc_az_count" {
   type        = number
   default     = 2
 }
+
+variable "aurora_engine_version" {
+  description = "Aurora PostgreSQL engine version."
+  type        = string
+  default     = "16.4"
+}
+
+variable "aurora_database_name" {
+  description = "Initial Aurora database name."
+  type        = string
+  default     = "p7vc_crm"
+}
+
+variable "aurora_serverless_min_capacity" {
+  description = "Aurora Serverless v2 minimum ACU."
+  type        = number
+  default     = 0.5
+}
+
+variable "aurora_serverless_max_capacity" {
+  description = "Aurora Serverless v2 maximum ACU."
+  type        = number
+  default     = 16
+}
+
+variable "aurora_deletion_protection" {
+  description = "Enable deletion protection on Aurora."
+  type        = bool
+  default     = true
+}

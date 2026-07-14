@@ -10,3 +10,9 @@ eu_region_deployment = false
 vpc_cidr           = "10.2.0.0/16"
 availability_zones = []
 vpc_az_count       = 3
+
+aurora_engine_version          = "16.4"
+aurora_database_name           = "p7vc_crm"
+aurora_serverless_min_capacity = 1
+aurora_serverless_max_capacity = 16
+aurora_deletion_protection     = true

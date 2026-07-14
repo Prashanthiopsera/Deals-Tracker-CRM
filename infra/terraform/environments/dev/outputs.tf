@@ -57,3 +57,18 @@ output "availability_zones" {
   description = "Availability zones used by the VPC."
   value       = module.vpc.availability_zones
 }
+
+output "aurora_cluster_endpoint" {
+  description = "Aurora writer endpoint."
+  value       = module.aurora.cluster_endpoint
+}
+
+output "aurora_reader_endpoint" {
+  description = "Aurora reader endpoint for RAG queries."
+  value       = module.aurora.reader_endpoint
+}
+
+output "aurora_master_secret_arn" {
+  description = "Secrets Manager ARN for Aurora master credentials."
+  value       = module.aurora.master_user_secret_arn
+}

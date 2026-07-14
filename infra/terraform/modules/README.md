@@ -11,7 +11,7 @@ root modules in `environments/dev`, `environments/staging`, and `environments/pr
 | Module | WO | Status | Description |
 |--------|----|--------|-------------|
 | `vpc` | WO-002 | Implemented | VPC, public/private/isolated subnets, NAT gateways, flow logs, NACLs |
-| `aurora` | WO-003 | Planned | Aurora PostgreSQL Serverless v2 cluster with RLS |
+| `aurora` | WO-003 | Implemented | Aurora PostgreSQL Serverless v2, pgvector, KMS, Secrets Manager rotation |
 | `ecs` | WO-004 | Planned | ECS Fargate cluster, task definitions, service mesh |
 | `api-gateway` | WO-005 | Planned | API Gateway REST/HTTP with WAF and usage plans |
 | `s3-kms` | WO-006/007 | Planned | S3 buckets with KMS CMK encryption |
