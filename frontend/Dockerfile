@@ -30,7 +30,6 @@ RUN addgroup -S app && adduser -S app -G app
 # Copy only the standalone output and static assets
 COPY --chown=app:app --from=builder /app/.next/standalone ./
 COPY --chown=app:app --from=builder /app/.next/static ./.next/static
-COPY --chown=app:app --from=builder /app/public ./public 2>/dev/null || true
 
 USER app
 EXPOSE 3001
