@@ -1,16 +1,11 @@
 import { ForbiddenException } from '@nestjs/common';
-import { AuditService } from '../audit/audit.service';
-import { InMemoryAuditLogRepository } from '../audit/audit-log.repository';
-import { AuditLogConsumer } from '../audit/audit-log.consumer';
-import { InMemoryAuditQueuePublisher } from '../audit/authorization-audit.publisher';
+import { createAuditTestStack } from '../audit/audit-test.utils';
 import { AdminAuditLogsService } from './admin-audit-logs.service';
 import { buildAdminAuditSearchFixture } from '../../test-fixtures/audit/admin-search-seed';
 import { AuditAction } from '../database/enums';
 
 describe('AdminAuditLogsService (WO-053)', () => {
-  const repository = new InMemoryAuditLogRepository();
-  const queue = new InMemoryAuditQueuePublisher();
-  const audit = new AuditService(queue, new AuditLogConsumer(repository), repository);
+  const { repository, queue, service: audit } = createAuditTestStack();
   const service = new AdminAuditLogsService(repository, audit);
 
   beforeEach(async () => {

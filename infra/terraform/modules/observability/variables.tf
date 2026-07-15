@@ -25,3 +25,9 @@ variable "auth_denial_alarm_threshold" {
   type        = number
   default     = 10
 }
+
+variable "audit_drift_alarm_threshold_percent" {
+  description = "Audit emitted vs persisted drift percentage before alarm fires."
+  type        = number
+  default     = 1
+}

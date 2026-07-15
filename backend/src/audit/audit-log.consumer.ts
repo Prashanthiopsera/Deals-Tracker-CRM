@@ -3,6 +3,7 @@ import { AuditAction } from '../database/enums';
 import { AuditLog } from '../database/entities/audit-log.entity';
 import { DomainAuditEvent } from './audit-log.types';
 import { AuditLogRepository } from './audit-log.repository';
+import { InMemoryAuditCompletenessMetrics } from './audit-completeness.metrics';
 
 function mapOperation(operation: DomainAuditEvent['operation']): AuditAction {
   switch (operation) {
@@ -36,7 +37,10 @@ function computeAffectedFields(
 
 @Injectable()
 export class AuditLogConsumer {
-  constructor(private readonly repository: AuditLogRepository) {}
+  constructor(
+    private readonly repository: AuditLogRepository,
+    private readonly metrics: InMemoryAuditCompletenessMetrics,
+  ) {}
 
   async persist(event: DomainAuditEvent): Promise<void> {
     const entry: Partial<AuditLog> = {
@@ -56,5 +60,6 @@ export class AuditLogConsumer {
       timestamp: new Date(event.timestamp),
     };
     await this.repository.insert(entry);
+    await this.metrics.recordPersisted(mapOperation(event.operation));
   }
 }

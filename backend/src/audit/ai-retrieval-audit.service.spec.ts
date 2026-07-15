@@ -1,13 +1,8 @@
 import { AiRetrievalAuditService } from './ai-retrieval-audit.service';
-import { AuditLogConsumer } from './audit-log.consumer';
-import { InMemoryAuditLogRepository } from './audit-log.repository';
-import { AuditService } from './audit.service';
-import { InMemoryAuditQueuePublisher } from './authorization-audit.publisher';
+import { createAuditTestStack } from './audit-test.utils';
 
 describe('AiRetrievalAuditService (WO-052)', () => {
-  const queue = new InMemoryAuditQueuePublisher();
-  const repository = new InMemoryAuditLogRepository();
-  const audit = new AuditService(queue, new AuditLogConsumer(repository), repository);
+  const { queue, repository, service: audit } = createAuditTestStack();
   const service = new AiRetrievalAuditService(audit);
 
   beforeEach(() => {

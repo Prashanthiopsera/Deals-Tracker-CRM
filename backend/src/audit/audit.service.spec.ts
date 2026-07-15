@@ -1,13 +1,8 @@
-import { AuditLogConsumer } from './audit-log.consumer';
-import { InMemoryAuditLogRepository } from './audit-log.repository';
+import { createAuditTestStack } from './audit-test.utils';
 import { AuditService } from './audit.service';
-import { InMemoryAuditQueuePublisher } from './authorization-audit.publisher';
 
 describe('AuditService (WO-044)', () => {
-  const queue = new InMemoryAuditQueuePublisher();
-  const repository = new InMemoryAuditLogRepository();
-  const consumer = new AuditLogConsumer(repository);
-  const service = new AuditService(queue, consumer, repository);
+  const { queue, repository, service } = createAuditTestStack();
 
   beforeEach(() => {
     queue.domainMessages.length = 0;

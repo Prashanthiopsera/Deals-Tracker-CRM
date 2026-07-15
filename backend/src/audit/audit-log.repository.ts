@@ -7,6 +7,7 @@ import { AuditEventQuery } from './audit-log.types';
 export interface AuditLogRepository {
   insert(entry: Partial<AuditLog>): Promise<void>;
   query(filters: AuditEventQuery): Promise<Partial<AuditLog>[]>;
+  count(): Promise<number>;
 }
 
 @Injectable()
@@ -28,6 +29,10 @@ export class InMemoryAuditLogRepository implements AuditLogRepository {
       return true;
     });
   }
+
+  async count(): Promise<number> {
+    return this.entries.length;
+  }
 }
 
 @Injectable()
@@ -47,5 +52,9 @@ export class TypeOrmAuditLogRepository implements AuditLogRepository {
     if (filters.from) qb.andWhere('a.timestamp >= :from', { from: filters.from });
     if (filters.to) qb.andWhere('a.timestamp <= :to', { to: filters.to });
     return qb.orderBy('a.timestamp', 'DESC').getMany();
+  }
+
+  async count(): Promise<number> {
+    return this.logs.count();
   }
 }

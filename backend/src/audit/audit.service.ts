@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import { AuditEventQuery, DomainAuditEvent } from './audit-log.types';
 import { AuditLogConsumer } from './audit-log.consumer';
 import { AuditLogRepository } from './audit-log.repository';
+import { InMemoryAuditCompletenessMetrics } from './audit-completeness.metrics';
 import { InMemoryAuditQueuePublisher } from './authorization-audit.publisher';
 
 @Injectable()
@@ -11,6 +12,7 @@ export class AuditService {
     private readonly queue: InMemoryAuditQueuePublisher,
     private readonly consumer: AuditLogConsumer,
     private readonly repository: AuditLogRepository,
+    private readonly metrics: InMemoryAuditCompletenessMetrics,
   ) {}
 
   publishAuditEvent(
@@ -30,6 +32,7 @@ export class AuditService {
       correlationId: input.correlationId ?? randomUUID(),
       metadata: input.metadata,
     };
+    void this.metrics.recordEmitted(event.operation);
     void this.queue.publishDomainEvent(event);
   }
 

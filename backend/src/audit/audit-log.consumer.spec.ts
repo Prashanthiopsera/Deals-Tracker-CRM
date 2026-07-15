@@ -1,13 +1,16 @@
+import { InMemoryAuditCompletenessMetrics } from './audit-completeness.metrics';
 import { AuditLogConsumer } from './audit-log.consumer';
 import { InMemoryAuditLogRepository } from './audit-log.repository';
 import { DomainAuditEvent } from './audit-log.types';
 
 describe('AuditLogConsumer (WO-044)', () => {
   const repository = new InMemoryAuditLogRepository();
-  const consumer = new AuditLogConsumer(repository);
+  const metrics = new InMemoryAuditCompletenessMetrics();
+  const consumer = new AuditLogConsumer(repository, metrics);
 
   beforeEach(() => {
     repository.entries.length = 0;
+    metrics.persisted.clear();
   });
 
   const baseEvent = (): DomainAuditEvent => ({
@@ -30,5 +33,10 @@ describe('AuditLogConsumer (WO-044)', () => {
   it('computes affected fields when not provided', async () => {
     await consumer.persist(baseEvent());
     expect(repository.entries[0].changedFields).toContain('notes');
+  });
+
+  it('records persisted metrics per operation', async () => {
+    await consumer.persist(baseEvent());
+    expect(metrics.persisted.get('update')).toBe(1);
   });
 });
