@@ -48,6 +48,7 @@ export class AuditLogConsumer {
       changedFields: event.affectedFields ?? computeAffectedFields(event.beforeState, event.afterState),
       metadata: {
         event_id: event.eventId,
+        correlation_id: event.correlationId,
         ...(event.metadata ?? {}),
       },
       timestamp: new Date(event.timestamp),

@@ -27,6 +27,7 @@ export class AuditService {
       beforeState: input.beforeState,
       afterState: input.afterState,
       affectedFields: input.affectedFields,
+      correlationId: input.correlationId ?? randomUUID(),
       metadata: input.metadata,
     };
     void this.queue.publishDomainEvent(event);

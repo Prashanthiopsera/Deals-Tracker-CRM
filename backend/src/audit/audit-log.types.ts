@@ -17,6 +17,7 @@ export interface DomainAuditEvent {
   afterState?: Record<string, unknown> | null;
   affectedFields?: string[];
   timestamp: string;
+  correlationId?: string;
   metadata?: Record<string, unknown>;
 }
 
