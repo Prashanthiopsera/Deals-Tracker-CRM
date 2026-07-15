@@ -19,6 +19,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { CommentsModule } from './comments/comments.module';
 import { CollaborationModule } from './collaboration/collaboration.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { DocumentsModule } from './documents/documents.module';
 import { CompaniesModule } from './companies/companies.module';
 
 @Module({
@@ -41,6 +42,7 @@ import { CompaniesModule } from './companies/companies.module';
     CommentsModule,
     CollaborationModule,
     NotificationsModule,
+    DocumentsModule,
     AdminModule,
     CompaniesModule,
     HealthModule,
