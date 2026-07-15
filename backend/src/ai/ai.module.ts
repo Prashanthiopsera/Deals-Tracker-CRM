@@ -6,8 +6,14 @@ import { PiiModule } from '../pii/pii.module';
 import { PiiRedactionService } from './pii-redaction.service';
 import { RagModule } from '../rag/rag.module';
 import { RetrievalService } from '../rag/retrieval.service';
+import {
+  AiAuditConsumer,
+  AiAuditLogService,
+  InMemoryAiAuditQueuePublisher,
+} from './ai-audit-log.service';
 import { ChatController } from './chat.controller';
 import { ChatService, InMemoryClaudeClient } from './chat.service';
+import { RedTeamEvalService } from './red-team-eval.service';
 
 @Module({
   imports: [AuditModule, PiiModule, RagModule],
@@ -15,6 +21,15 @@ import { ChatService, InMemoryClaudeClient } from './chat.service';
   providers: [
     InMemoryClaudeClient,
     AiRetrievalAuditService,
+    InMemoryAiAuditQueuePublisher,
+    AiAuditConsumer,
+    RedTeamEvalService,
+    {
+      provide: AiAuditLogService,
+      useFactory: (queue: InMemoryAiAuditQueuePublisher, consumer: AiAuditConsumer) =>
+        new AiAuditLogService(queue, consumer),
+      inject: [InMemoryAiAuditQueuePublisher, AiAuditConsumer],
+    },
     {
       provide: ChatService,
       useFactory: (
@@ -34,6 +49,6 @@ import { ChatService, InMemoryClaudeClient } from './chat.service';
     },
     PiiRedactionService,
   ],
-  exports: [PiiRedactionService, ChatService],
+  exports: [PiiRedactionService, ChatService, AiAuditLogService, RedTeamEvalService],
 })
 export class AiModule {}
