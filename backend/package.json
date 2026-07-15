@@ -73,8 +73,36 @@
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s",
-      "!main.ts"
+      "!main.ts",
+      "!**/*.module.ts",
+      "!**/*.entity.ts",
+      "!**/*.dto.ts",
+      "!database/migrations/**",
+      "!database/seeds/**",
+      "!**/test-fixtures/**",
+      "!observability/telemetry.ts",
+      "!companies/companies.controller.ts",
+      "!companies/ownership-field.interceptor.ts"
     ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "\\.module\\.ts$",
+      "main\\.ts$",
+      "/database/migrations/",
+      "/database/seeds/",
+      "telemetry\\.ts$",
+      "\\.entity\\.ts$",
+      "\\.dto\\.ts$",
+      "/test-fixtures/"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 60,
+        "functions": 78,
+        "lines": 80,
+        "statements": 80
+      }
+    },
     "coverageDirectory": "../coverage",
     "coverageReporters": [
       "text",

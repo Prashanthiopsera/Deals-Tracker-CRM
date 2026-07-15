@@ -79,6 +79,48 @@ describe('CompaniesService', () => {
     (repo.findOne as jest.Mock).mockResolvedValue(null);
     await expect(service.getById('missing')).rejects.toThrow(NotFoundException);
   });
+
+  it('patches company fields and publishes audit', async () => {
+    const result = await service.patch(company.id, { notes: 'Updated' }, 'actor-1', 'Director');
+    expect(result.notes).toBe('Updated');
+    expect(queue.domainMessages[0].operation).toBe('update');
+  });
+
+  it('transitions deal stage with audit trail', async () => {
+    const result = await service.transitionStage(
+      company.id,
+      DealStage.SCREENING,
+      'actor-1',
+      'Director',
+    );
+    expect(result.deal_stage).toBe(DealStage.SCREENING);
+  });
+
+  it('reassigns ownership fields', async () => {
+    const result = await service.reassignOwner(
+      company.id,
+      { deal_lead_user_id: '22222222-2222-2222-2222-222222222222' },
+      'actor-1',
+      'Director',
+    );
+    expect(result.deal_lead_id).toBe('22222222-2222-2222-2222-222222222222');
+  });
+
+  it('lists companies with cursor pagination metadata', async () => {
+    (repo.createQueryBuilder as jest.Mock).mockReturnValue({
+      where: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      addOrderBy: jest.fn().mockReturnThis(),
+      skip: jest.fn().mockReturnThis(),
+      take: jest.fn().mockReturnThis(),
+      getCount: jest.fn(async () => 2),
+      getMany: jest.fn(async () => [company, { ...company, id: '22222222-2222-2222-2222-222222222222' }]),
+    });
+    const result = await service.list({ limit: 1, sort_by: 'name', sort_order: 'ASC' });
+    expect(result.has_more).toBe(true);
+    expect(result.cursor).toBeTruthy();
+  });
 });
 
 describe('companies DTO validation', () => {

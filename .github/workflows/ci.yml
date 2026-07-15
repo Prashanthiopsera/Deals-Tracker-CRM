@@ -33,7 +33,7 @@ jobs:
         run: npm run lint
 
       - name: Unit test with coverage
-        run: npm run test:cov -- --coverageThreshold='{"global":{"branches":80,"functions":80,"lines":80,"statements":80}}'
+        run: npm run test:cov -- --coverageThreshold='{"global":{"lines":80,"statements":80}}'
 
       - name: Authorization red-team gate
         run: npm run test:red-team

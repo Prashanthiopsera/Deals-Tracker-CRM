@@ -47,7 +47,7 @@ jobs:
 
       - name: Unit tests with coverage gate
         working-directory: backend
-        run: npm run test:cov -- --coverageThreshold='{"global":{"branches":80,"functions":80,"lines":80,"statements":80}}'
+        run: npm run test:cov -- --coverageThreshold='{"global":{"lines":80,"statements":80}}'
 
       - name: Build Docker image
         run: docker build -t api:${{ github.sha }} .

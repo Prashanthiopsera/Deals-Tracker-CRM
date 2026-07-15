@@ -5,9 +5,18 @@ import { Test } from '@nestjs/testing';
 import { UnauthorizedException } from '@nestjs/common';
 
 describe('JwtAuthGuard', () => {
+  const reflector = {
+    getAllAndOverride: jest.fn(),
+  } as unknown as Reflector;
+
+  afterEach(() => {
+    delete process.env.AUTH_BYPASS;
+    jest.clearAllMocks();
+  });
+
   it('allows bypass mode for tests', () => {
     process.env.AUTH_BYPASS = 'true';
-    const guard = new JwtAuthGuard(new Reflector());
+    const guard = new JwtAuthGuard(reflector);
     const context = {
       switchToHttp: () => ({
         getRequest: () => ({ path: '/api/companies' }),
@@ -16,7 +25,53 @@ describe('JwtAuthGuard', () => {
       getClass: () => ({}),
     };
     expect(guard.canActivate(context as never)).toBe(true);
-    delete process.env.AUTH_BYPASS;
+  });
+
+  it('allows public routes and health checks', () => {
+    const guard = new JwtAuthGuard(reflector);
+    (reflector.getAllAndOverride as jest.Mock).mockReturnValueOnce(true);
+    const publicContext = {
+      switchToHttp: () => ({ getRequest: () => ({ path: '/api/companies' }) }),
+      getHandler: () => ({}),
+      getClass: () => ({}),
+    };
+    expect(guard.canActivate(publicContext as never)).toBe(true);
+
+    (reflector.getAllAndOverride as jest.Mock).mockReturnValueOnce(false);
+    const healthContext = {
+      switchToHttp: () => ({ getRequest: () => ({ path: '/api/health' }) }),
+      getHandler: () => ({}),
+      getClass: () => ({}),
+    };
+    expect(guard.canActivate(healthContext as never)).toBe(true);
+  });
+
+  it('injects test user headers in bypass mode', () => {
+    process.env.AUTH_BYPASS = 'true';
+    const guard = new JwtAuthGuard(reflector);
+    const request: {
+      path: string;
+      headers: Record<string, string>;
+      user?: { p7vcRole: string; p7vcUserId: string };
+    } = {
+      path: '/api/companies',
+      headers: {
+        'x-p7vc-test-role': 'Director',
+        'x-p7vc-test-user-id': 'user-123',
+      },
+    };
+    const context = {
+      switchToHttp: () => ({ getRequest: () => request }),
+      getHandler: () => ({}),
+      getClass: () => ({}),
+    };
+    expect(guard.canActivate(context as never)).toBe(true);
+    expect(request.user).toMatchObject({ p7vcRole: 'Director', p7vcUserId: 'user-123' });
+  });
+
+  it('throws when handleRequest receives no user', () => {
+    const guard = new JwtAuthGuard(reflector);
+    expect(() => guard.handleRequest(null, undefined)).toThrow(UnauthorizedException);
   });
 });
 

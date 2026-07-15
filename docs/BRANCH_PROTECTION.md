@@ -11,6 +11,7 @@ Configure these rules on the `main` branch in GitHub **Settings → Branches →
   - `Terraform Plan / plan (dev)`
   - `Terraform Plan / plan (staging)`
   - `Terraform Plan / plan (prod)`
+  - `CI / ci`
   - `Build and Deploy / build`
 - **Require conversation resolution before merging**
 - **Do not allow bypassing the above settings** (including administrators for production compliance)
