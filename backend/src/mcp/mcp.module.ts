@@ -7,6 +7,7 @@ import { CompaniesService } from '../companies/companies.service';
 import { CedarAuthorizationService } from '../authorization/cedar.service';
 import { McpAuthService, InMemoryMcpAuthTokenValidator } from './mcp-auth.service';
 import { McpHealthController } from './mcp-health.controller';
+import { McpObservabilityService, InMemoryMcpMetricPublisher, McpRateLimiter } from './mcp-observability.service';
 import { McpToolExecutorService } from './mcp-tool-executor.service';
 import { McpToolRegistry, McpTransportService } from './mcp-server.service';
 import { McpToolsService } from './mcp-tools.service';
@@ -32,11 +33,17 @@ import { McpToolsService } from './mcp-tools.service';
         new McpToolsService(companies, audit),
       inject: [CompaniesService, AuditService],
     },
+    McpRateLimiter,
+    InMemoryMcpMetricPublisher,
+    McpObservabilityService,
     {
       provide: McpToolExecutorService,
-      useFactory: (auth: McpAuthService, tools: McpToolsService) =>
-        new McpToolExecutorService(auth, tools),
-      inject: [McpAuthService, McpToolsService],
+      useFactory: (
+        auth: McpAuthService,
+        tools: McpToolsService,
+        observability: McpObservabilityService,
+      ) => new McpToolExecutorService(auth, tools, observability),
+      inject: [McpAuthService, McpToolsService, McpObservabilityService],
     },
     {
       provide: McpToolRegistry,

@@ -4,6 +4,7 @@ import { CompaniesInMemoryService } from '../companies/companies-in-memory.servi
 import { InMemoryCedarCache } from '../authorization/cedar-cache';
 import { CedarAuthorizationService, VerifiedPermissionsClient } from '../authorization/cedar.service';
 import { InMemoryMcpAuthTokenValidator, McpAuthService } from './mcp-auth.service';
+import { McpObservabilityService, InMemoryMcpMetricPublisher, McpRateLimiter } from './mcp-observability.service';
 import { McpToolExecutorService } from './mcp-tool-executor.service';
 import { McpToolsService } from './mcp-tools.service';
 
@@ -17,7 +18,11 @@ describe('McpToolsService (WO-086)', () => {
     new InMemoryCedarCache(),
   );
   const auth = new McpAuthService(cedar, audit, new InMemoryMcpAuthTokenValidator());
-  const executor = new McpToolExecutorService(auth, tools);
+  const observability = new McpObservabilityService(
+    new InMemoryMcpMetricPublisher(),
+    new McpRateLimiter(),
+  );
+  const executor = new McpToolExecutorService(auth, tools, observability);
 
   beforeEach(() => {
     queue.domainMessages.length = 0;
