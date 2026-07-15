@@ -9,16 +9,22 @@ import {
 } from './dsar.service';
 import { ErasureController } from './erasure.controller';
 import { ErasureService, InMemoryKmsErasureClient } from './erasure.service';
+import { RetentionPolicyController } from './retention-policy.controller';
+import {
+  InMemoryRetentionMetricsPublisher,
+  RetentionPolicyService,
+} from './retention-policy.service';
 import { PiiDiscoveryService } from '../pii/pii-discovery.service';
 import { AuditService } from '../audit/audit.service';
 
 @Module({
   imports: [AuditModule, PiiModule],
-  controllers: [DsarController, ErasureController],
+  controllers: [DsarController, ErasureController, RetentionPolicyController],
   providers: [
     InMemoryDsarExportStore,
     InMemoryWorkflowTopicPublisher,
     InMemoryKmsErasureClient,
+    InMemoryRetentionMetricsPublisher,
     {
       provide: DsarService,
       useFactory: (
@@ -43,7 +49,16 @@ import { AuditService } from '../audit/audit.service';
       ) => new ErasureService(discovery, audit, kms),
       inject: [PiiDiscoveryService, AuditService, InMemoryKmsErasureClient],
     },
+    {
+      provide: RetentionPolicyService,
+      useFactory: (
+        audit: AuditService,
+        erasure: ErasureService,
+        metrics: InMemoryRetentionMetricsPublisher,
+      ) => new RetentionPolicyService(audit, erasure, metrics),
+      inject: [AuditService, ErasureService, InMemoryRetentionMetricsPublisher],
+    },
   ],
-  exports: [DsarService, ErasureService],
+  exports: [DsarService, ErasureService, RetentionPolicyService],
 })
 export class ComplianceModule {}
