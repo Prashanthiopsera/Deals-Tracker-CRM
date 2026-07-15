@@ -1,0 +1,4 @@
+# Snyk policy — fail CI on high or critical vulnerabilities
+version: v1.25.0
+ignore: {}
+patch: {}

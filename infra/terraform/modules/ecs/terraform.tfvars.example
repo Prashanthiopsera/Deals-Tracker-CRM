@@ -1,0 +1,41 @@
+# Example variable values for the ECS module.
+
+project_name = "p7vc-crm"
+environment  = "dev"
+aws_region   = "us-east-1"
+
+# From VPC module outputs:
+# vpc_id             = "vpc-xxxxxxxx"
+# private_subnet_ids = ["subnet-aaa", "subnet-bbb"]
+# public_subnet_ids  = ["subnet-ccc", "subnet-ddd"]
+
+app_port         = 3000
+container_cpu    = 512
+container_memory = 1024
+desired_count    = 1
+
+deployment_minimum_healthy_percent = 100
+deployment_maximum_percent         = 200
+
+autoscaling_min_capacity = 1
+autoscaling_max_capacity = 4
+
+cpu_target_utilization = 70
+requests_per_target    = 1000
+
+health_check_path     = "/api/health"
+health_check_interval = 30
+healthy_threshold     = 3
+
+container_image = "public.ecr.aws/docker/library/nginx:stable-alpine"
+container_name  = "p7vc-api"
+
+# aurora_secret_arn = "arn:aws:secretsmanager:us-east-1:123456789012:secret:xxx"
+auth0_domain   = "p7vc.auth0.com"
+auth0_audience = "https://api.p7vc-crm.com"
+
+common_tags = {
+  Project     = "p7vc-crm"
+  ManagedBy   = "terraform"
+  Environment = "dev"
+}

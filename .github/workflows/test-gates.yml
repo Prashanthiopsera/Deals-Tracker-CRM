@@ -1,0 +1,42 @@
+name: E2E Test Gates
+
+on:
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 2 1 * *'
+
+jobs:
+  rbac-gates:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - name: RBAC boundary suite
+        run: npm test -- --testPathPattern=e2e/rbac-permission-boundary
+      - name: Audit completeness suite
+        run: npm test -- --testPathPattern=e2e/audit-completeness
+      - name: MCP authorization suite
+        run: npm test -- --testPathPattern=e2e/mcp-authorization
+
+  red-team-monthly:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm test -- --testPathPattern=e2e/ai-red-team-eval

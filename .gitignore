@@ -1,0 +1,19 @@
+
+# Forge
+.forge-commit-ready
+.forge/project-id
+.cursor/hooks.json
+.cursor/hooks/
+.cursor/rules/forge-workflow.mdc
+
+# Node
+node_modules/
+dist/
+coverage/
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+!*.tfvars.example

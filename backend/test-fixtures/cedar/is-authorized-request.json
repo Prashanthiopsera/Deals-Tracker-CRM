@@ -1,0 +1,15 @@
+{
+  "policyStoreId": "ps-example",
+  "principal": {
+    "entityType": "P7VC::User",
+    "entityId": "director-1"
+  },
+  "action": {
+    "actionType": "P7VC::Action",
+    "actionId": "read"
+  },
+  "resource": {
+    "entityType": "P7VC::Company",
+    "entityId": "company-1"
+  }
+}

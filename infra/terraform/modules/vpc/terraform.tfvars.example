@@ -1,0 +1,26 @@
+# Example variable values for the VPC module.
+# These values are consumed by environment root modules — not applied directly.
+
+project_name = "p7vc-crm"
+environment  = "dev"
+aws_region   = "us-east-1"
+
+# Primary VPC CIDR. Default /16 supports 3 subnet tiers across multiple AZs.
+vpc_cidr = "10.0.0.0/16"
+
+# Leave empty to auto-select the first az_count available AZs in the region.
+# Override for EU deployment or explicit AZ pinning:
+# availability_zones = ["us-east-1a", "us-east-1b"]
+availability_zones = []
+
+# Minimum 2 AZs required for high availability.
+az_count = 2
+
+# SOC 2 CC7.2 — 90-day retention for network flow logs.
+flow_log_retention_days = 90
+
+common_tags = {
+  Project     = "p7vc-crm"
+  ManagedBy   = "terraform"
+  Environment = "dev"
+}

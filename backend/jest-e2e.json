@@ -1,0 +1,25 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testMatch": [
+    "<rootDir>/test/red-team/**/*.e2e-spec.ts",
+    "<rootDir>/test/e2e/**/*.spec.ts"
+  ],
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "modulePaths": ["<rootDir>/src"],
+  "reporters": [
+    "default",
+    [
+      "jest-junit",
+      {
+        "outputDirectory": "./test-results",
+        "outputName": "red-team-junit.xml",
+        "suiteName": "Authorization Red-Team"
+      }
+    ]
+  ],
+  "setupFiles": ["<rootDir>/test-setup.ts"]
+}

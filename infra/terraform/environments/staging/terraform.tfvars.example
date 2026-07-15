@@ -1,0 +1,25 @@
+# Example Terraform variable values for the staging environment.
+# Copy this file to terraform.tfvars and fill in the appropriate values.
+# Do NOT commit terraform.tfvars — it is excluded by .gitignore.
+
+aws_region           = "us-east-1"
+environment          = "staging"
+project_name         = "p7vc-crm"
+eu_region_deployment = false
+
+vpc_cidr           = "10.1.0.0/16"
+availability_zones = []
+vpc_az_count       = 2
+
+aurora_engine_version          = "16.4"
+aurora_database_name           = "p7vc_crm"
+aurora_serverless_min_capacity = 0.5
+aurora_serverless_max_capacity = 8
+aurora_deletion_protection     = true
+
+ecs_container_cpu              = 1024
+ecs_container_memory           = 2048
+ecs_desired_count              = 2
+ecs_autoscaling_min_capacity   = 2
+ecs_autoscaling_max_capacity   = 8
+ecs_container_image            = "public.ecr.aws/docker/library/nginx:stable-alpine"

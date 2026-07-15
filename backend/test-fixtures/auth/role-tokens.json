@@ -1,0 +1,46 @@
+[
+  {
+    "role": "Director",
+    "userId": "director-1",
+    "teamId": "team-1",
+    "claims": {
+      "sub": "auth0|director-1",
+      "p7vc_user_id": "director-1",
+      "p7vc_role": "Director",
+      "p7vc_team_id": "team-1"
+    }
+  },
+  {
+    "role": "Principal",
+    "userId": "principal-1",
+    "teamId": "team-1",
+    "claims": {
+      "sub": "auth0|principal-1",
+      "p7vc_user_id": "principal-1",
+      "p7vc_role": "Principal",
+      "p7vc_team_id": "team-1"
+    }
+  },
+  {
+    "role": "Associate",
+    "userId": "associate-1",
+    "teamId": "team-1",
+    "claims": {
+      "sub": "auth0|associate-1",
+      "p7vc_user_id": "associate-1",
+      "p7vc_role": "Associate",
+      "p7vc_team_id": "team-1"
+    }
+  },
+  {
+    "role": "Intern",
+    "userId": "intern-1",
+    "teamId": "team-1",
+    "claims": {
+      "sub": "auth0|intern-1",
+      "p7vc_user_id": "intern-1",
+      "p7vc_role": "Intern",
+      "p7vc_team_id": "team-1"
+    }
+  }
+]

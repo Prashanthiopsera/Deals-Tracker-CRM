@@ -1,0 +1,116 @@
+{
+  "name": "p7vc-crm-backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "nest build",
+    "start": "node dist/main",
+    "start:dev": "nest start --watch",
+    "test": "jest",
+    "test:cov": "jest --coverage",
+    "test:red-team": "AUTH_BYPASS=true CEDAR_BYPASS=false jest --config jest-e2e.json --runInBand",
+    "lint": "eslint \"{src,test}/**/*.ts\"",
+    "migration:generate": "typeorm-ts-node-commonjs migration:generate src/database/migrations/Migration -d src/database/data-source.ts",
+    "migration:run": "typeorm-ts-node-commonjs migration:run -d src/database/data-source.ts",
+    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/database/data-source.ts",
+    "migration:dry-run": "ts-node scripts/run-migrations.ts --dry-run",
+    "seed:reference": "ts-node scripts/seed-reference.ts",
+    "seed:test": "ts-node scripts/seed-test.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cloudwatch": "^3.1087.0",
+    "@aws-sdk/client-sqs": "^3.1087.0",
+    "@nestjs/common": "^10.4.15",
+    "@nestjs/core": "^10.4.15",
+    "@nestjs/passport": "^10.0.3",
+    "@nestjs/platform-express": "^10.4.15",
+    "@nestjs/typeorm": "^10.0.2",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.54.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.56.0",
+    "@opentelemetry/resources": "^1.29.0",
+    "@opentelemetry/sdk-node": "^0.56.0",
+    "@opentelemetry/semantic-conventions": "^1.28.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "ioredis": "^5.11.1",
+    "jwks-rsa": "^3.1.0",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "pg": "^8.13.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "typeorm": "^0.3.20"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.4.9",
+    "@nestjs/testing": "^10.4.15",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^20.17.10",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/supertest": "^6.0.3",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
+    "eslint": "^8.57.1",
+    "jest": "^29.7.0",
+    "jest-junit": "^16.0.0",
+    "supertest": "^7.2.2",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s",
+      "!main.ts",
+      "!**/*.module.ts",
+      "!**/*.entity.ts",
+      "!**/*.dto.ts",
+      "!database/migrations/**",
+      "!database/seeds/**",
+      "!**/test-fixtures/**",
+      "!observability/telemetry.ts",
+      "!companies/companies.controller.ts",
+      "!companies/ownership-field.interceptor.ts"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "\\.module\\.ts$",
+      "main\\.ts$",
+      "/database/migrations/",
+      "/database/seeds/",
+      "telemetry\\.ts$",
+      "\\.entity\\.ts$",
+      "\\.dto\\.ts$",
+      "/test-fixtures/"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 60,
+        "functions": 78,
+        "lines": 80,
+        "statements": 80
+      }
+    },
+    "coverageDirectory": "../coverage",
+    "coverageReporters": [
+      "text",
+      "lcov"
+    ],
+    "testEnvironment": "node",
+    "setupFiles": [
+      "<rootDir>/../test-setup.ts"
+    ]
+  }
+}
