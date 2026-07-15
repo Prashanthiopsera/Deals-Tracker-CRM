@@ -14,6 +14,7 @@ import { RagModule } from './rag/rag.module';
 import { McpModule } from './mcp/mcp.module';
 import { AgentModule } from './agent/agent.module';
 import { ConnectorModule } from './connectors/connector.module';
+import { ActivitiesModule } from './activities/activities.module';
 import { CompaniesModule } from './companies/companies.module';
 
 @Module({
@@ -31,6 +32,7 @@ import { CompaniesModule } from './companies/companies.module';
     McpModule,
     AgentModule,
     ConnectorModule,
+    ActivitiesModule,
     AdminModule,
     CompaniesModule,
     HealthModule,
