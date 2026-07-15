@@ -1,15 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import {
   analyticsCompanyFixtures,
   analyticsTransitionFixtures,
 } from '../../test-fixtures/analytics/analytics.fixture';
 import { StageTransitionHistoryService } from './stage-transition-history.service';
+import { AnalyticsMetricsService } from './analytics-metrics.service';
 
 @Injectable()
 export class AnalyticsService {
-  constructor(private readonly transitions: StageTransitionHistoryService) {}
+  constructor(
+    private readonly transitions: StageTransitionHistoryService,
+    @Optional() private readonly metrics?: AnalyticsMetricsService,
+  ) {}
 
   pipelineSummary(filters: Record<string, string | undefined> = {}) {
+    const started = Date.now();
     const companies = analyticsCompanyFixtures.filter((company) =>
       this.matchesCompanyFilters(company, filters),
     );
@@ -17,7 +22,13 @@ export class AnalyticsService {
       acc[company.deal_stage] = (acc[company.deal_stage] ?? 0) + 1;
       return acc;
     }, {});
-    return { stages: counts, total: companies.length };
+    const result = { stages: counts, total: companies.length };
+    this.metrics?.recordQuery({
+      endpoint: 'pipeline-summary',
+      durationMs: Date.now() - started,
+      resultCount: result.total,
+    });
+    return result;
   }
 
   conversionRates() {

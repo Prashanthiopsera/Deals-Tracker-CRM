@@ -1,8 +1,9 @@
 import { AnalyticsService } from './analytics.service';
+import { AnalyticsMetricsService } from './analytics-metrics.service';
 import { StageTransitionHistoryService } from './stage-transition-history.service';
 
 describe('AnalyticsService (WO-107)', () => {
-  const service = new AnalyticsService(new StageTransitionHistoryService());
+  const service = new AnalyticsService(new StageTransitionHistoryService(), new AnalyticsMetricsService());
 
   it('returns pipeline summary grouped by stage', () => {
     const summary = service.pipelineSummary();
