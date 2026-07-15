@@ -9,6 +9,7 @@ import { DatabaseModule } from './database/database.module';
 import { PiiModule } from './pii/pii.module';
 import { AiModule } from './ai/ai.module';
 import { ComplianceModule } from './compliance/compliance.module';
+import { SearchModule } from './search/search.module';
 import { CompaniesModule } from './companies/companies.module';
 
 @Module({
@@ -21,6 +22,7 @@ import { CompaniesModule } from './companies/companies.module';
     PiiModule,
     AiModule,
     ComplianceModule,
+    SearchModule,
     AdminModule,
     CompaniesModule,
     HealthModule,
