@@ -1,0 +1,67 @@
+{
+  "family": "p7vc-crm-frontend",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::ACCOUNT_ID:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::ACCOUNT_ID:role/p7vc-crm-task-role",
+  "containerDefinitions": [
+    {
+      "name": "frontend",
+      "image": "ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/p7vc-crm-frontend:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3001,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "NODE_ENV", "value": "production" },
+        { "name": "PORT", "value": "3001" },
+        { "name": "HOSTNAME", "value": "0.0.0.0" },
+        { "name": "AUTH0_AUDIENCE", "value": "https://api.p7vc-crm.com" },
+        { "name": "AUTH0_HOSTED_DOMAIN", "value": "opsera.io" },
+        { "name": "NEXT_TELEMETRY_DISABLED", "value": "1" }
+      ],
+      "secrets": [
+        {
+          "name": "AUTH0_DOMAIN",
+          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:p7vc-crm/AUTH0_DOMAIN"
+        },
+        {
+          "name": "AUTH0_CLIENT_ID",
+          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:p7vc-crm/AUTH0_CLIENT_ID"
+        },
+        {
+          "name": "AUTH0_CLIENT_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:p7vc-crm/AUTH0_CLIENT_SECRET"
+        },
+        {
+          "name": "APP_BASE_URL",
+          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:p7vc-crm/APP_BASE_URL"
+        },
+        {
+          "name": "REDIS_URL",
+          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:p7vc-crm/REDIS_URL"
+        }
+      ],
+      "healthCheck": {
+        "command": ["CMD-SHELL", "wget -qO- http://127.0.0.1:3001/ || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/p7vc-crm-frontend",
+          "awslogs-region": "REGION",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}
