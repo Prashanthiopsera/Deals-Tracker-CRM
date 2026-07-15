@@ -1,0 +1,26 @@
+export const activityTimelineFixtures = [
+  {
+    company_id: '11111111-1111-1111-1111-111111111111',
+    user_id: 'director-1',
+    activity_type: 'email' as const,
+    source: 'gmail' as const,
+    subject: 'Follow up on diligence',
+    body_preview: 'Thanks for the call',
+    participants: [{ name: 'CEO' }],
+    occurred_at: '2026-07-13T10:00:00Z',
+    metadata: {},
+    external_id: 'email-1',
+  },
+  {
+    company_id: '11111111-1111-1111-1111-111111111111',
+    user_id: 'director-1',
+    activity_type: 'calendar_event' as const,
+    source: 'google_calendar' as const,
+    subject: 'Partner review',
+    body_preview: 'Upcoming IC review',
+    participants: [{ name: 'Team' }],
+    occurred_at: '2026-07-20T15:00:00Z',
+    metadata: { upcoming: true },
+    external_id: 'cal-1',
+  },
+];

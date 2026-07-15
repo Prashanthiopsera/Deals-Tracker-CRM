@@ -30,6 +30,7 @@ import {
 import { CompaniesService } from './companies.service';
 import { CompanyEnrichmentTrigger } from './company-enrichment.trigger';
 import { CompanyOwnershipService } from './company-ownership.service';
+import { ActivityTimelineService } from '../activities/activity-timeline.service';
 import { OwnershipFieldInterceptor } from './ownership-field.interceptor';
 import { OwnershipPatchGuard } from './ownership-patch.guard';
 
@@ -41,6 +42,7 @@ export class CompaniesController {
     private readonly companies: CompaniesService,
     private readonly ownership: CompanyOwnershipService,
     private readonly enrichmentTrigger: CompanyEnrichmentTrigger,
+    private readonly activityTimeline: ActivityTimelineService,
   ) {}
 
   @Get()
@@ -51,7 +53,12 @@ export class CompaniesController {
   @Get(':id')
   async get(@Param('id') id: string) {
     try {
-      return await this.companies.getById(id);
+      const company = await this.companies.getById(id);
+      return {
+        ...company,
+        last_touch: this.activityTimeline.computeLastTouch(id),
+        next_step: this.activityTimeline.computeNextStep(id),
+      };
     } catch {
       throw new NotFoundException({ message: 'Company not found' });
     }
