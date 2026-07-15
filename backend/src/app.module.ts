@@ -22,6 +22,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { DocumentsModule } from './documents/documents.module';
 import { ExportsModule } from './exports/exports.module';
 import { ReportsModule } from './reports/reports.module';
+import { DigestModule } from './digest/digest.module';
 import { CompaniesModule } from './companies/companies.module';
 
 @Module({
@@ -47,6 +48,7 @@ import { CompaniesModule } from './companies/companies.module';
     DocumentsModule,
     ExportsModule,
     ReportsModule,
+    DigestModule,
     AdminModule,
     CompaniesModule,
     HealthModule,
