@@ -1,0 +1,105 @@
+# Single Deployment running the combined image (backend :3000 + frontend :3001).
+# Name MUST stay "deals-tracker-crm" — the Forge deploy step tracks/patches it.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deals-tracker-crm
+  namespace: p7vc-crm
+  labels:
+    app: deals-tracker-crm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deals-tracker-crm
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: deals-tracker-crm
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: deals-tracker-crm
+          # Forge substitutes the pushed image; keep the repo here for plain `kubectl apply`.
+          image: 792373136340.dkr.ecr.us-west-2.amazonaws.com/opsera/events:latest
+          imagePullPolicy: Always
+          ports:
+            - name: api
+              containerPort: 3000
+            - name: frontend
+              containerPort: 3001
+          envFrom:
+            - configMapRef:
+                name: p7vc-crm-config
+          env:
+            # DATABASE_URL is required for the backend to boot.
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: p7vc-crm-secrets
+                  key: DATABASE_URL
+            # The rest are optional so a missing key never blocks pod startup.
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: p7vc-crm-secrets
+                  key: REDIS_URL
+                  optional: true
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: p7vc-crm-secrets
+                  key: JWT_SECRET
+                  optional: true
+            - name: AUTH0_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: p7vc-crm-secrets
+                  key: AUTH0_DOMAIN
+                  optional: true
+            - name: AUTH0_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: p7vc-crm-secrets
+                  key: AUTH0_CLIENT_ID
+                  optional: true
+            - name: AUTH0_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: p7vc-crm-secrets
+                  key: AUTH0_CLIENT_SECRET
+                  optional: true
+            - name: AUTH0_APP_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: p7vc-crm-secrets
+                  key: AUTH0_APP_BASE_URL
+                  optional: true
+          # Backend is the readiness gate. If the frontend dies, start.sh exits
+          # and the whole pod restarts.
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 40
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health/ready
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests: { cpu: 250m, memory: 384Mi }
+            limits: { cpu: "1", memory: 768Mi }
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 5"]

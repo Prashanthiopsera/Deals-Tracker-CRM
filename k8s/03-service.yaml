@@ -1,0 +1,19 @@
+# One Service fronting the single pod; exposes both container ports.
+apiVersion: v1
+kind: Service
+metadata:
+  name: p7vc-crm-svc
+  namespace: p7vc-crm
+  labels:
+    app: deals-tracker-crm
+spec:
+  type: ClusterIP
+  selector:
+    app: deals-tracker-crm
+  ports:
+    - name: api
+      port: 3000
+      targetPort: 3000
+    - name: frontend
+      port: 3001
+      targetPort: 3001
