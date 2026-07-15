@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { CompanyStatus, DealStage } from '../database/enums';
 import { CreateCompanyDto, ListCompaniesQueryDto, UpdateCompanyDto } from './companies.dto';
+import { applyCompanyFilters, paginateCompanyRows } from './companies-list';
 import { SqsCompanyAuditPublisher } from './companies.service';
 import { toCompanyResponse } from './ownership-fields';
 
@@ -85,20 +86,8 @@ export class CompaniesInMemoryService {
   }
 
   async list(query: ListCompaniesQueryDto) {
-    const active = this.companies.filter((c) => !c.deletedAt);
-    const page = Number(query.page ?? 1);
-    const limit = Math.min(Number(query.limit ?? 20), 100);
-    let filtered = active;
-    if (query.deal_stage) filtered = filtered.filter((c) => c.dealStage === query.deal_stage);
-    if (query.status) filtered = filtered.filter((c) => c.status === query.status);
-    if (query.sector) filtered = filtered.filter((c) => c.sector === query.sector);
-    if (query.geography) filtered = filtered.filter((c) => c.geography === query.geography);
-    if (query.tags) filtered = filtered.filter((c) => c.tags.includes(query.tags!));
-    const start = (page - 1) * limit;
-    return {
-      items: filtered.slice(start, start + limit).map((c) => this.toResponse(c)),
-      total: filtered.length,
-    };
+    const filtered = applyCompanyFilters(this.companies, query);
+    return paginateCompanyRows(filtered, query, (company) => this.toResponse(company));
   }
 
   async getById(id: string) {

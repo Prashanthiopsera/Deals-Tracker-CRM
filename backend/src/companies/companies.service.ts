@@ -5,6 +5,12 @@ import { AuditService } from '../audit/audit.service';
 import { Company } from '../database/entities/company.entity';
 import { CompanyStatus, DealStage } from '../database/enums';
 import { CreateCompanyDto, ListCompaniesQueryDto, ReassignOwnerDto, UpdateCompanyDto } from './companies.dto';
+import {
+  applyTypeOrmCompanyFilters,
+  applyTypeOrmCompanySort,
+  decodeListCursor,
+  paginateCompanyRows,
+} from './companies-list';
 import { toCompanyResponse } from './ownership-fields';
 import { validateStageTransition, stageDateKey } from './stage-transitions';
 
@@ -75,18 +81,71 @@ export class CompaniesService {
   }
 
   async list(query: ListCompaniesQueryDto) {
-    const page = Number(query.page ?? 1);
     const limit = Math.min(Number(query.limit ?? 20), 100);
-    const qb = this.companies.createQueryBuilder('c').where('c.deletedAt IS NULL');
-    if (query.deal_stage) qb.andWhere('c.dealStage = :dealStage', { dealStage: query.deal_stage });
-    if (query.status) qb.andWhere('c.status = :status', { status: query.status });
-    if (query.sector) qb.andWhere('c.sector = :sector', { sector: query.sector });
-    if (query.geography) qb.andWhere('c.geography = :geography', { geography: query.geography });
-    if (query.tags) qb.andWhere(':tag = ANY(c.tags)', { tag: query.tags });
-    const sortColumn = query.sort_by === 'updated_at' ? 'c.updatedAt' : 'c.createdAt';
-    qb.orderBy(sortColumn, query.sort_order ?? 'DESC');
-    const [items, total] = await qb.skip((page - 1) * limit).take(limit).getManyAndCount();
-    return { items: items.map((c) => this.toResponse(c)), total };
+    const countQb = applyTypeOrmCompanyFilters(this.companies.createQueryBuilder('c'), query);
+    const total = await countQb.getCount();
+
+    const dataQb = applyTypeOrmCompanySort(
+      applyTypeOrmCompanyFilters(this.companies.createQueryBuilder('c'), query),
+      query,
+    );
+
+    if (query.cursor) {
+      const decoded = decodeListCursor(query.cursor);
+      if (decoded) {
+        const sortColumn =
+          query.sort_by === 'updated_at'
+            ? 'c.updatedAt'
+            : query.sort_by === 'name'
+              ? 'c.name'
+              : query.sort_by === 'deal_stage'
+                ? 'c.dealStage'
+                : query.sort_by === 'sector'
+                  ? 'c.sector'
+                  : 'c.createdAt';
+        const op = (query.sort_order ?? 'DESC') === 'DESC' ? '<' : '>';
+        dataQb.andWhere(
+          `(${sortColumn}, c.id) ${op} (:cursorSortValue, :cursorId)`,
+          { cursorSortValue: decoded.sortValue, cursorId: decoded.id },
+        );
+      }
+    } else if (query.page) {
+      dataQb.skip((Number(query.page) - 1) * limit);
+    }
+
+    const rows = await dataQb.take(limit + 1).getMany();
+    const hasMore = rows.length > limit;
+    const pageRows = hasMore ? rows.slice(0, limit) : rows;
+    const items = pageRows.map((c) => this.toResponse(c));
+    const last = pageRows[pageRows.length - 1];
+    const sortField =
+      query.sort_by === 'updated_at'
+        ? last?.updatedAt
+        : query.sort_by === 'name'
+          ? last?.name
+          : query.sort_by === 'deal_stage'
+            ? last?.dealStage
+            : query.sort_by === 'sector'
+              ? last?.sector
+              : last?.createdAt;
+
+    return {
+      items,
+      total,
+      limit,
+      cursor:
+        hasMore && last
+          ? Buffer.from(
+              JSON.stringify({
+                id: last.id,
+                sortValue:
+                  sortField instanceof Date ? sortField.toISOString() : String(sortField ?? ''),
+              }),
+              'utf8',
+            ).toString('base64url')
+          : null,
+      has_more: hasMore,
+    };
   }
 
   async getById(id: string): Promise<Record<string, unknown>> {

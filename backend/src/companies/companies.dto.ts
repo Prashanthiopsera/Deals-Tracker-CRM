@@ -108,6 +108,30 @@ export class ListCompaniesQueryDto {
 
   @IsOptional()
   tags?: string;
+
+  @IsOptional()
+  @IsString()
+  deal_lead_user_id?: string;
+
+  @IsOptional()
+  @IsString()
+  created_after?: string;
+
+  @IsOptional()
+  @IsString()
+  created_before?: string;
+
+  @IsOptional()
+  @IsString()
+  updated_after?: string;
+
+  @IsOptional()
+  @IsString()
+  updated_before?: string;
+
+  @IsOptional()
+  @IsString()
+  cursor?: string;
 }
 
 export function validateCreateCompanyDto(payload: Record<string, unknown>): CreateCompanyDto {
