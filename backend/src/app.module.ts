@@ -18,6 +18,7 @@ import { ActivitiesModule } from './activities/activities.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { CommentsModule } from './comments/comments.module';
 import { CollaborationModule } from './collaboration/collaboration.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { CompaniesModule } from './companies/companies.module';
 
 @Module({
@@ -39,6 +40,7 @@ import { CompaniesModule } from './companies/companies.module';
     AnalyticsModule,
     CommentsModule,
     CollaborationModule,
+    NotificationsModule,
     AdminModule,
     CompaniesModule,
     HealthModule,
