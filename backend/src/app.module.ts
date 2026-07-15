@@ -23,6 +23,7 @@ import { DocumentsModule } from './documents/documents.module';
 import { ExportsModule } from './exports/exports.module';
 import { ReportsModule } from './reports/reports.module';
 import { DigestModule } from './digest/digest.module';
+import { AutomationModule } from './automation/automation.module';
 import { CompaniesModule } from './companies/companies.module';
 
 @Module({
@@ -49,6 +50,7 @@ import { CompaniesModule } from './companies/companies.module';
     ExportsModule,
     ReportsModule,
     DigestModule,
+    AutomationModule,
     AdminModule,
     CompaniesModule,
     HealthModule,
