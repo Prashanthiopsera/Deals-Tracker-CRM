@@ -17,6 +17,7 @@ import { ConnectorModule } from './connectors/connector.module';
 import { ActivitiesModule } from './activities/activities.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { CommentsModule } from './comments/comments.module';
+import { CollaborationModule } from './collaboration/collaboration.module';
 import { CompaniesModule } from './companies/companies.module';
 
 @Module({
@@ -37,6 +38,7 @@ import { CompaniesModule } from './companies/companies.module';
     ActivitiesModule,
     AnalyticsModule,
     CommentsModule,
+    CollaborationModule,
     AdminModule,
     CompaniesModule,
     HealthModule,
