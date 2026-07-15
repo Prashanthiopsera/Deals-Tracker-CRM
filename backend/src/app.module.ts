@@ -20,6 +20,7 @@ import { CommentsModule } from './comments/comments.module';
 import { CollaborationModule } from './collaboration/collaboration.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { DocumentsModule } from './documents/documents.module';
+import { ExportsModule } from './exports/exports.module';
 import { CompaniesModule } from './companies/companies.module';
 
 @Module({
@@ -43,6 +44,7 @@ import { CompaniesModule } from './companies/companies.module';
     CollaborationModule,
     NotificationsModule,
     DocumentsModule,
+    ExportsModule,
     AdminModule,
     CompaniesModule,
     HealthModule,
