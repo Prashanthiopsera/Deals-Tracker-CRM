@@ -7,15 +7,18 @@ import {
   InMemoryDsarExportStore,
   InMemoryWorkflowTopicPublisher,
 } from './dsar.service';
+import { ErasureController } from './erasure.controller';
+import { ErasureService, InMemoryKmsErasureClient } from './erasure.service';
 import { PiiDiscoveryService } from '../pii/pii-discovery.service';
 import { AuditService } from '../audit/audit.service';
 
 @Module({
   imports: [AuditModule, PiiModule],
-  controllers: [DsarController],
+  controllers: [DsarController, ErasureController],
   providers: [
     InMemoryDsarExportStore,
     InMemoryWorkflowTopicPublisher,
+    InMemoryKmsErasureClient,
     {
       provide: DsarService,
       useFactory: (
@@ -31,7 +34,16 @@ import { AuditService } from '../audit/audit.service';
         InMemoryWorkflowTopicPublisher,
       ],
     },
+    {
+      provide: ErasureService,
+      useFactory: (
+        discovery: PiiDiscoveryService,
+        audit: AuditService,
+        kms: InMemoryKmsErasureClient,
+      ) => new ErasureService(discovery, audit, kms),
+      inject: [PiiDiscoveryService, AuditService, InMemoryKmsErasureClient],
+    },
   ],
-  exports: [DsarService],
+  exports: [DsarService, ErasureService],
 })
 export class ComplianceModule {}

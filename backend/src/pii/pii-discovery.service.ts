@@ -166,4 +166,46 @@ export class PiiDiscoveryService {
 
     return matches;
   }
+
+  eraseSubjectData(identifier: string): number {
+    const identifierType = this.resolveIdentifierType(identifier.trim());
+    const needle = identifier.trim().toLowerCase();
+    let erasedCount = 0;
+
+    this.contacts = this.contacts.filter((contact) => {
+      const isMatch =
+        (identifierType === 'email' && contact.email?.toLowerCase() === needle) ||
+        (identifierType === 'contact_id' && contact.id === identifier.trim()) ||
+        (identifierType === 'name' &&
+          `${contact.firstName} ${contact.lastName}`.toLowerCase().includes(needle));
+      if (isMatch) {
+        erasedCount += 1;
+        return false;
+      }
+      return true;
+    });
+
+    for (const company of this.companies) {
+      if (company.notes?.toLowerCase().includes(needle)) {
+        company.notes = null;
+        erasedCount += 1;
+      }
+    }
+
+    for (const activity of this.activities) {
+      const haystack = JSON.stringify({
+        subject: activity.subject,
+        body: activity.body,
+        metadata: activity.metadata,
+      }).toLowerCase();
+      if (haystack.includes(needle)) {
+        activity.subject = null;
+        activity.body = null;
+        activity.metadata = {};
+        erasedCount += 1;
+      }
+    }
+
+    return erasedCount;
+  }
 }
