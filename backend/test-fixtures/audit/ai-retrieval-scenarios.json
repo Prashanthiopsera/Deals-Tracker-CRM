@@ -1,0 +1,27 @@
+[
+  {
+    "scenario": "simple_query",
+    "prompt": "What is the latest note?",
+    "retrieved_chunk_count": 1
+  },
+  {
+    "scenario": "multi_chunk",
+    "prompt": "Compare financials",
+    "retrieved_chunk_count": 4
+  },
+  {
+    "scenario": "pii_redaction",
+    "prompt": "Show contact email",
+    "pii_redacted_fields": ["email"]
+  },
+  {
+    "scenario": "empty_results",
+    "prompt": "Find unknown doc",
+    "retrieved_chunk_count": 0
+  },
+  {
+    "scenario": "error_case",
+    "prompt": "Trigger failure",
+    "error": "model_timeout"
+  }
+]

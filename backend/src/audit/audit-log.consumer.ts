@@ -17,6 +17,8 @@ function mapOperation(operation: DomainAuditEvent['operation']): AuditAction {
       return AuditAction.REASSIGN;
     case 'stage_transition':
       return AuditAction.STAGE_TRANSITION;
+    case 'ai_retrieval':
+      return AuditAction.AI_RETRIEVAL;
     default:
       return AuditAction.UPDATE;
   }

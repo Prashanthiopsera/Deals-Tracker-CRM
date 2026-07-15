@@ -4,7 +4,8 @@ export type DomainAuditOperation =
   | 'delete'
   | 'reassign'
   | 'stage_transition'
-  | 'ownership_reassignment';
+  | 'ownership_reassignment'
+  | 'ai_retrieval';
 
 export interface DomainAuditEvent {
   eventId: string;

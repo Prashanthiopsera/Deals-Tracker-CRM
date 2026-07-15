@@ -4,6 +4,7 @@ import { AuditLog } from '../database/entities/audit-log.entity';
 import { AuditLogConsumer } from './audit-log.consumer';
 import { InMemoryAuditLogRepository } from './audit-log.repository';
 import { AuditService } from './audit.service';
+import { AiRetrievalAuditService } from './ai-retrieval-audit.service';
 import {
   AuthorizationAuditConsumer,
   AuthorizationAuditService,
@@ -30,6 +31,7 @@ import {
     LayeredAuthorizationMetrics,
     InMemoryAuditLogRepository,
     AuditLogConsumer,
+    AiRetrievalAuditService,
     {
       provide: AuthorizationAuditConsumer,
       useFactory: (repo: InMemoryAuditLogRepository) => new AuthorizationAuditConsumer(repo),
@@ -56,6 +58,7 @@ import {
   ],
   exports: [
     AuditService,
+    AiRetrievalAuditService,
     AuthorizationAuditService,
     InMemoryAuditQueuePublisher,
     InMemoryAuditLogRepository,
