@@ -70,9 +70,9 @@ export default function DashboardPage() {
       <div className={styles.page}>
         <div className={styles.header}>
           <div>
-            <h1 className={styles.title}>Dashboard</h1>
+            <h1 className={styles.title}>Deal Flow Dashboard</h1>
             <p className={styles.subtitle}>
-              Welcome back — here&apos;s your P7VC deal flow at a glance.
+              Welcome back — here&apos;s your P7VC portfolio &amp; deal flow at a glance.
             </p>
           </div>
         </div>
@@ -90,7 +90,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick links */}
-        <h2 className={styles.sectionTitle}>Quick Access</h2>
+        <h2 className={styles.sectionTitle}>Quick Actions</h2>
         <div className={styles.quickGrid}>
           {QUICK_LINKS.map((item) => (
             <Link key={item.href} href={item.href} className={styles.quickCard}>
