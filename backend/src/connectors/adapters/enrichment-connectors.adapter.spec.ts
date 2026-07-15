@@ -11,7 +11,7 @@ describe('EnrichmentConnectorAdapters (WO-096)', () => {
   it('normalizes Apollo enrichment proposals', async () => {
     const adapter = new ApolloConnectorAdapter();
     const result = await adapter.execute({ company_name: 'Acme' });
-    expect(result.proposals.length).toBeGreaterThan(0);
+    expect(Array.isArray(result.proposals) ? result.proposals.length : 0).toBeGreaterThan(0);
   });
 
   it('enforces token bucket rate limits', () => {
