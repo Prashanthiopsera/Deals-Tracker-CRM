@@ -59,6 +59,7 @@ export class CompaniesService {
       dealStage: dto.deal_stage ?? DealStage.SOURCED,
       status: dto.status ?? CompanyStatus.ACTIVE,
       tags: dto.tags ?? [],
+      createdById: actorId,
     });
     const saved = await this.companies.save(entity);
     const response = this.toResponse(saved);

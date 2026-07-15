@@ -18,6 +18,7 @@ interface MemoryCompany {
   tags: string[];
   notes: string | null;
   keyDates: Record<string, string>;
+  createdById: string | null;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -49,6 +50,7 @@ export class CompaniesInMemoryService {
         tags: ['priority'],
         notes: 'Priority target',
         keyDates: {},
+        createdById: '22222222-2222-2222-2222-222222222222',
         createdAt: now,
         updatedAt: now,
         deletedAt: null,
@@ -71,6 +73,7 @@ export class CompaniesInMemoryService {
       tags: dto.tags ?? [],
       notes: null,
       keyDates: {},
+      createdById: actorId,
       createdAt: now,
       updatedAt: now,
       deletedAt: null,

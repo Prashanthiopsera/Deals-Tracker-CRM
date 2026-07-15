@@ -57,6 +57,7 @@ export class CompaniesController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @CedarAuthorize('create', 'Company')
   async create(
     @Body() body: CreateCompanyDto,
     @Req() req: Request & { user: AuthUserContext },
