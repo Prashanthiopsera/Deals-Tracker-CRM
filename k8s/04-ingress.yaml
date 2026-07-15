@@ -1,0 +1,33 @@
+# nginx ingress on this cluster's shared LB + wildcard DNS (*.agent.opsera.dev).
+# Two hosts avoid the /api collision between the NestJS API (/api/*) and the
+# Next.js frontend's own BFF routes (/api/auth/*):
+#   frontend UI  → https://p7vc-crm.agent.opsera.dev
+#   backend API  → https://p7vc-crm-api.agent.opsera.dev
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: p7vc-crm-ingress
+  namespace: p7vc-crm
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: p7vc-crm.agent.opsera.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: p7vc-crm-svc
+                port:
+                  number: 3001
+    - host: p7vc-crm-api.agent.opsera.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: p7vc-crm-svc
+                port:
+                  number: 3000
