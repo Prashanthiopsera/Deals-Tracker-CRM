@@ -6,6 +6,11 @@ import { AuthorizationModule } from '../authorization/authorization.module';
 import { AuthModule } from '../auth/auth.module';
 import { AdminAuditLogsController } from './admin-audit-logs.controller';
 import { AdminAuditLogsService } from './admin-audit-logs.service';
+import { AdminConnectorsController } from './admin-connectors.controller';
+import {
+  AdminConnectorsService,
+  InMemorySecretsManagerClient,
+} from './admin-connectors.service';
 import { AdminPoliciesController } from './admin-policies.controller';
 import {
   AdminPoliciesService,
@@ -22,10 +27,16 @@ const eventsMock = {
 
 @Module({
   imports: [AuthModule, AuthorizationModule, AuditModule],
-  controllers: [AdminUsersController, AdminAuditLogsController, AdminPoliciesController],
+  controllers: [
+    AdminUsersController,
+    AdminAuditLogsController,
+    AdminPoliciesController,
+    AdminConnectorsController,
+  ],
   providers: [
     SecretsManagerAuth0Client,
     InMemoryVerifiedPermissionsAdminClient,
+    InMemorySecretsManagerClient,
     {
       provide: AdminAuditLogsService,
       useFactory: (audit: AuditService, repo: InMemoryAuditLogRepository) =>
@@ -43,6 +54,12 @@ const eventsMock = {
       useFactory: (avp: InMemoryVerifiedPermissionsAdminClient, audit: AuditService) =>
         new AdminPoliciesService(avp, audit),
       inject: [InMemoryVerifiedPermissionsAdminClient, AuditService],
+    },
+    {
+      provide: AdminConnectorsService,
+      useFactory: (secrets: InMemorySecretsManagerClient, audit: AuditService) =>
+        new AdminConnectorsService(secrets, audit),
+      inject: [InMemorySecretsManagerClient, AuditService],
     },
   ],
 })
