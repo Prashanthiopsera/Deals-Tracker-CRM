@@ -6,8 +6,10 @@ import { AuditService } from '../audit/audit.service';
 import { CompaniesService } from '../companies/companies.service';
 import { CedarAuthorizationService } from '../authorization/cedar.service';
 import { McpAuthService, InMemoryMcpAuthTokenValidator } from './mcp-auth.service';
+import { McpExceptionFilter } from './mcp-exception.filter';
 import { McpHealthController } from './mcp-health.controller';
 import { McpObservabilityService, InMemoryMcpMetricPublisher, McpRateLimiter } from './mcp-observability.service';
+import { McpResilienceService } from './mcp-resilience.service';
 import { McpToolExecutorService } from './mcp-tool-executor.service';
 import { McpToolRegistry, McpTransportService } from './mcp-server.service';
 import { McpToolsService } from './mcp-tools.service';
@@ -17,6 +19,8 @@ import { McpToolsService } from './mcp-tools.service';
   controllers: [McpHealthController],
   providers: [
     McpTransportService,
+    McpResilienceService,
+    McpExceptionFilter,
     InMemoryMcpAuthTokenValidator,
     {
       provide: McpAuthService,
