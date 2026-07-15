@@ -4,6 +4,7 @@ import { AuditLog } from '../database/entities/audit-log.entity';
 import { DomainAuditEvent } from './audit-log.types';
 import { AuditLogRepository } from './audit-log.repository';
 import { InMemoryAuditCompletenessMetrics } from './audit-completeness.metrics';
+import { computeAuditTamperHash } from './audit-hash.util';
 
 function mapOperation(operation: DomainAuditEvent['operation']): AuditAction {
   switch (operation) {
@@ -55,6 +56,14 @@ export class AuditLogConsumer {
       metadata: {
         event_id: event.eventId,
         correlation_id: event.correlationId,
+        tamper_hash: computeAuditTamperHash({
+          actorId: event.actorId,
+          operation: event.operation,
+          resourceId: event.resourceId,
+          beforeState: event.beforeState,
+          afterState: event.afterState,
+          timestamp: event.timestamp,
+        }),
         ...(event.metadata ?? {}),
       },
       timestamp: new Date(event.timestamp),
