@@ -13,6 +13,7 @@ import { SearchModule } from './search/search.module';
 import { RagModule } from './rag/rag.module';
 import { McpModule } from './mcp/mcp.module';
 import { AgentModule } from './agent/agent.module';
+import { ConnectorModule } from './connectors/connector.module';
 import { CompaniesModule } from './companies/companies.module';
 
 @Module({
@@ -29,6 +30,7 @@ import { CompaniesModule } from './companies/companies.module';
     RagModule,
     McpModule,
     AgentModule,
+    ConnectorModule,
     AdminModule,
     CompaniesModule,
     HealthModule,
