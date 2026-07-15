@@ -10,8 +10,8 @@ import { AgentQueueService } from './agent-queue.service';
 import { AgentTask, AgentTaskStatus, AgentTaskTransition, AgentType } from './agent.types';
 
 const VALID_TRANSITIONS: Record<AgentTaskStatus, AgentTaskStatus[]> = {
-  proposed: ['pending_approval', 'rejected'],
-  pending_approval: ['approved', 'rejected'],
+  proposed: ['pending_approval', 'rejected', 'failed'],
+  pending_approval: ['approved', 'rejected', 'failed'],
   approved: ['executed', 'failed'],
   rejected: [],
   executed: [],
@@ -115,6 +115,35 @@ export class AgentTaskService {
 
   seed(task: AgentTask): void {
     this.tasks.set(task.id, task);
+  }
+
+  markFailed(taskId: string, reason: string): AgentTask {
+    const task = this.getTask(taskId);
+    const before = task.status;
+    if (!['proposed', 'pending_approval', 'approved'].includes(before)) {
+      throw new BadRequestException(`Cannot fail task in status ${before}`);
+    }
+    task.status = 'failed';
+    task.updated_at = new Date().toISOString();
+    this.recordTransition(task.id, before, 'failed', task.acting_user_id, reason);
+    this.publishAudit(task, 'reject', reason);
+    return task;
+  }
+
+  async approvePartial(
+    taskId: string,
+    approverId: string,
+    role: string,
+    approvedFields: Record<string, unknown>,
+    rejectedFields: string[],
+  ): Promise<AgentTask> {
+    const task = this.getTask(taskId);
+    task.proposed_changes = {
+      approved: approvedFields,
+      rejected: rejectedFields,
+      remaining: task.proposed_changes,
+    };
+    return this.approve(taskId, approverId, role);
   }
 
   private getTask(taskId: string): AgentTask {

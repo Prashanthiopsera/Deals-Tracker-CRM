@@ -28,6 +28,7 @@ import {
   validateCreateCompanyDto,
 } from './companies.dto';
 import { CompaniesService } from './companies.service';
+import { CompanyEnrichmentTrigger } from './company-enrichment.trigger';
 import { CompanyOwnershipService } from './company-ownership.service';
 import { OwnershipFieldInterceptor } from './ownership-field.interceptor';
 import { OwnershipPatchGuard } from './ownership-patch.guard';
@@ -39,6 +40,7 @@ export class CompaniesController {
   constructor(
     private readonly companies: CompaniesService,
     private readonly ownership: CompanyOwnershipService,
+    private readonly enrichmentTrigger: CompanyEnrichmentTrigger,
   ) {}
 
   @Get()
@@ -67,7 +69,15 @@ export class CompaniesController {
     } catch (error) {
       throw new BadRequestException({ message: String(error) });
     }
-    return this.companies.create(body, req.user.p7vcUserId, req.user.p7vcRole);
+    const created = await this.companies.create(body, req.user.p7vcUserId, req.user.p7vcRole);
+    await this.enrichmentTrigger.onCompanyCreated({
+      companyId: String(created.id),
+      companyName: body.company_name,
+      actorId: req.user.p7vcUserId,
+      actorRole: req.user.p7vcRole,
+      userEnteredFields: body as unknown as Record<string, unknown>,
+    });
+    return created;
   }
 
   @Patch(':id/stage')
