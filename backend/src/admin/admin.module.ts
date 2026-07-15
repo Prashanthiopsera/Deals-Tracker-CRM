@@ -17,6 +17,7 @@ import {
   InMemoryVerifiedPermissionsAdminClient,
 } from './admin-policies.service';
 import { AdminDsarController } from './admin-dsar.controller';
+import { AdminDlpPolicyService } from './admin-dlp-policy.service';
 import {
   AdminDsarService,
   InMemoryDsarObjectStore,
@@ -46,6 +47,7 @@ const eventsMock = {
     InMemoryVerifiedPermissionsAdminClient,
     InMemorySecretsManagerClient,
     InMemoryDsarObjectStore,
+    AdminDlpPolicyService,
     {
       provide: AdminAuditLogsService,
       useFactory: (audit: AuditService, repo: InMemoryAuditLogRepository) =>

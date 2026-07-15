@@ -16,6 +16,12 @@ export class AdminConnectorsController {
     return this.connectors.list(req.user.p7vcRole);
   }
 
+  @Get('health')
+  @CedarAuthorize('read', 'Connector')
+  health(@Req() req: Request & { user: AuthUserContext }) {
+    return this.connectors.aggregateHealth(req.user.p7vcRole);
+  }
+
   @Get(':id')
   @CedarAuthorize('read', 'Connector')
   get(@Param('id') id: string, @Req() req: Request & { user: AuthUserContext }) {

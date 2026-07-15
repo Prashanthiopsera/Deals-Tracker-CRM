@@ -63,6 +63,28 @@ export class AdminConnectorsService {
     return { ...connector };
   }
 
+  aggregateHealth(actorRole: string) {
+    this.assertAdmin(actorRole);
+    const healthy = this.connectors.filter((c) => c.healthStatus === 'healthy').length;
+    const degraded = this.connectors.filter((c) => c.healthStatus === 'degraded').length;
+    const failed = this.connectors.filter((c) => c.healthStatus === 'offline').length;
+    return {
+      total: this.connectors.length,
+      healthy,
+      degraded,
+      failed,
+      dlp_violations_24h: 0,
+      connectors: this.connectors.map((connector) => ({
+        id: connector.id,
+        name: connector.name,
+        enabled: connector.enabled,
+        healthStatus: connector.healthStatus,
+        lastSyncAt: connector.lastSyncAt,
+        circuit_breaker_state: 'closed',
+      })),
+    };
+  }
+
   async rotateCredentials(
     id: string,
     credentials: Record<string, string>,
