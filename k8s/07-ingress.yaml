@@ -1,0 +1,48 @@
+# AWS Load Balancer Controller (ALB Ingress) — pre-installed on most EKS clusters.
+# If your cluster uses nginx-ingress instead, replace the annotations with:
+#   kubernetes.io/ingress.class: nginx
+# and remove the alb.* annotations.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: p7vc-crm-ingress
+  namespace: p7vc-crm
+  annotations:
+    # ── AWS ALB Controller ─────────────────────────────────────────────────
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    # Replace with your ACM certificate ARN
+    # alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:792373136340:certificate/REPLACE_ME
+    alb.ingress.kubernetes.io/healthcheck-path: /
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: "30"
+    alb.ingress.kubernetes.io/success-codes: "200,301,302"
+    # ── WAF (optional) ────────────────────────────────────────────────────
+    # alb.ingress.kubernetes.io/wafv2-acl-arn: arn:aws:wafv2:us-west-2:792373136340:regional/webacl/REPLACE_ME
+spec:
+  rules:
+    # ── Frontend: app.p7vc-crm.com → port 3001 ────────────────────────────
+    - host: app.p7vc-crm.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: p7vc-crm-frontend-svc
+                port:
+                  number: 3001
+
+    # ── Backend API: api.p7vc-crm.com → port 3000 ─────────────────────────
+    - host: api.p7vc-crm.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: p7vc-crm-api-svc
+                port:
+                  number: 3000

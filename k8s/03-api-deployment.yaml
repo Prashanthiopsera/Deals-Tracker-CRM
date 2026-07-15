@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: p7vc-crm-api
+  namespace: p7vc-crm
+  labels:
+    app: p7vc-crm-api
+    component: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: p7vc-crm-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: p7vc-crm-api
+        component: backend
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: api
+          # Opsera substitutes $APP_IMAGE with the ECR image pushed in push-ecr step
+          # e.g. 792373136340.dkr.ecr.us-west-2.amazonaws.com/p7vc-crm:latest
+          image: 792373136340.dkr.ecr.us-west-2.amazonaws.com/p7vc-crm:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: p7vc-crm-config
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: p7vc-crm-secrets
+                  key: DATABASE_URL
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: p7vc-crm-secrets
+                  key: REDIS_URL
+            - name: AUTH0_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: p7vc-crm-secrets
+                  key: AUTH0_DOMAIN
+            - name: AUTH0_AUDIENCE
+              valueFrom:
+                configMapKeyRef:
+                  name: p7vc-crm-config
+                  key: AUTH0_AUDIENCE
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: p7vc-crm-secrets
+                  key: JWT_SECRET
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health/ready
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 5"]
