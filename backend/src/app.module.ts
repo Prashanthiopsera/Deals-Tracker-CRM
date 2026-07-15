@@ -26,6 +26,7 @@ import { DigestModule } from './digest/digest.module';
 import { AutomationModule } from './automation/automation.module';
 import { CompaniesModule } from './companies/companies.module';
 import { ContactsModule } from './contacts/contacts.module';
+import { RelationshipModule } from './relationship/relationship.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { ContactsModule } from './contacts/contacts.module';
     AdminModule,
     CompaniesModule,
     ContactsModule,
+    RelationshipModule,
     HealthModule,
   ],
 })
