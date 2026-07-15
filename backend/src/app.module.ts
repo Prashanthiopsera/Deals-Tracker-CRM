@@ -25,6 +25,7 @@ import { ReportsModule } from './reports/reports.module';
 import { DigestModule } from './digest/digest.module';
 import { AutomationModule } from './automation/automation.module';
 import { CompaniesModule } from './companies/companies.module';
+import { ContactsModule } from './contacts/contacts.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { CompaniesModule } from './companies/companies.module';
     AutomationModule,
     AdminModule,
     CompaniesModule,
+    ContactsModule,
     HealthModule,
   ],
 })
