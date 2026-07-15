@@ -85,3 +85,24 @@ forbid (
   ],
   resource
 );
+
+@id("associate-stage-transition")
+permit (
+  principal in P7VC::Role::"Associate",
+  action == P7VC::Action::"stage_transition",
+  resource is P7VC::Company
+);
+
+@id("principal-reassign-owner")
+permit (
+  principal in P7VC::Role::"Principal",
+  action == P7VC::Action::"reassign",
+  resource is P7VC::Company
+);
+
+@id("intern-deny-stage-transition")
+forbid (
+  principal in P7VC::Role::"Intern",
+  action == P7VC::Action::"stage_transition",
+  resource is P7VC::Company
+);
