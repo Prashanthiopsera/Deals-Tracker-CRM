@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: p7vc-crm-frontend
+  namespace: p7vc-crm
+  labels:
+    app: p7vc-crm-frontend
+    component: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: p7vc-crm-frontend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: p7vc-crm-frontend
+        component: frontend
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: frontend
+          # Separate ECR repo for the frontend image
+          # e.g. 792373136340.dkr.ecr.us-west-2.amazonaws.com/p7vc-crm-frontend:latest
+          image: 792373136340.dkr.ecr.us-west-2.amazonaws.com/p7vc-crm-frontend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3001
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: p7vc-crm-config
+          env:
+            - name: AUTH0_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: p7vc-crm-secrets
+                  key: AUTH0_DOMAIN
+            - name: AUTH0_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: p7vc-crm-secrets
+                  key: AUTH0_CLIENT_ID
+            - name: AUTH0_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: p7vc-crm-secrets
+                  key: AUTH0_CLIENT_SECRET
+            - name: AUTH0_APP_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: p7vc-crm-secrets
+                  key: AUTH0_APP_BASE_URL
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: p7vc-crm-secrets
+                  key: REDIS_URL
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3001
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3001
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 5"]
