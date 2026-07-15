@@ -22,9 +22,11 @@ export interface DomainAuditEvent {
   metadata?: Record<string, unknown>;
 }
 
+import { AuditAction } from '../database/enums';
+
 export interface AuditEventQuery {
   actorId?: string;
-  operation?: DomainAuditOperation;
+  operation?: DomainAuditOperation | AuditAction;
   resourceType?: string;
   resourceId?: string;
   from?: Date;
