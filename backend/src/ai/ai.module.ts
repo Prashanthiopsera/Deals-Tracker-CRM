@@ -49,6 +49,6 @@ import { RedTeamEvalService } from './red-team-eval.service';
     },
     PiiRedactionService,
   ],
-  exports: [PiiRedactionService, ChatService, AiAuditLogService, RedTeamEvalService],
+  exports: [PiiRedactionService, ChatService, AiAuditLogService, RedTeamEvalService, InMemoryClaudeClient],
 })
 export class AiModule {}

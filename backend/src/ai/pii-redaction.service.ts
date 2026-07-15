@@ -90,6 +90,13 @@ export class PiiRedactionService {
     return this.resolveRedaction(actorRole, classification) === 'masked';
   }
 
+  redactText(text: string): { content: string } {
+    let content = text;
+    content = content.replace(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g, REDACTED_VALUE);
+    content = content.replace(/\+?[\d][\d\-()\s]{6,}/g, REDACTED_VALUE);
+    return { content };
+  }
+
   private resolveRedaction(actorRole: string, classification: PiiClassification): RedactionAction {
     if (classification === PiiClassification.RESTRICTED && actorRole !== UserRole.ADMIN) {
       return 'masked';
