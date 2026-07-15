@@ -16,6 +16,7 @@ import { AgentModule } from './agent/agent.module';
 import { ConnectorModule } from './connectors/connector.module';
 import { ActivitiesModule } from './activities/activities.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { CommentsModule } from './comments/comments.module';
 import { CompaniesModule } from './companies/companies.module';
 
 @Module({
@@ -35,6 +36,7 @@ import { CompaniesModule } from './companies/companies.module';
     ConnectorModule,
     ActivitiesModule,
     AnalyticsModule,
+    CommentsModule,
     AdminModule,
     CompaniesModule,
     HealthModule,
