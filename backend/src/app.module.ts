@@ -10,6 +10,7 @@ import { PiiModule } from './pii/pii.module';
 import { AiModule } from './ai/ai.module';
 import { ComplianceModule } from './compliance/compliance.module';
 import { SearchModule } from './search/search.module';
+import { RagModule } from './rag/rag.module';
 import { CompaniesModule } from './companies/companies.module';
 
 @Module({
@@ -23,6 +24,7 @@ import { CompaniesModule } from './companies/companies.module';
     AiModule,
     ComplianceModule,
     SearchModule,
+    RagModule,
     AdminModule,
     CompaniesModule,
     HealthModule,
