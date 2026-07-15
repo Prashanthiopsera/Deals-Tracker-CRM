@@ -11,15 +11,20 @@ export function authConfig() {
   };
 }
 
-export function loginRedirect() {
+export function loginRedirect(connection?: string) {
   const { domain, clientId, audience, baseUrl } = authConfig();
+  const hostedDomain = process.env.AUTH0_HOSTED_DOMAIN ?? 'opsera.io';
   const params = new URLSearchParams({
     client_id: clientId,
     response_type: 'code',
     redirect_uri: `${baseUrl}/api/auth/callback`,
     scope: 'openid profile email offline_access',
     audience,
+    hd: hostedDomain,
   });
+  if (connection) {
+    params.set('connection', connection);
+  }
   return NextResponse.redirect(`https://${domain}/authorize?${params.toString()}`);
 }
 

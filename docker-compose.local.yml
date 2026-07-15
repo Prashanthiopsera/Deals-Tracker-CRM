@@ -1,0 +1,66 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: p7vc_crm
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_local:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d p7vc_crm"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+      - api_node_modules:/app/node_modules
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/p7vc_crm
+      PORT: "3000"
+      NODE_ENV: development
+      OTEL_SDK_DISABLED: "true"
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: sh -c "npm install --prefer-offline && ./node_modules/.bin/ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d src/database/data-source.ts || true && npm run start:dev"
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    env_file:
+      - ./frontend/.env.local
+    environment:
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3001:3001"
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: sh -c "npm install --prefer-offline && npx next dev -p 3001"
+
+volumes:
+  pgdata_local:
+  api_node_modules:
+  frontend_node_modules:
