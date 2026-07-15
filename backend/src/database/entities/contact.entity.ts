@@ -49,6 +49,9 @@ export class Contact {
   })
   piiClassification!: PiiClassification;
 
+  @Column({ name: 'pii_tags', type: 'jsonb', default: () => "'{}'" })
+  piiTags!: Record<string, { classification: PiiClassification }>;
+
   @Column({ name: 'company_id', type: 'uuid' })
   companyId!: string;
 
