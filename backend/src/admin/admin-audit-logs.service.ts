@@ -55,6 +55,38 @@ export class AdminAuditLogsService {
     return { items, total, page, pageSize, totalPages };
   }
 
+  async exportCsv(query: AdminAuditLogSearchQueryDto, actor: { id: string; role: string }): Promise<string> {
+    const result = await this.search({ ...query, page: 1, pageSize: 200 }, actor);
+    const header = [
+      'id',
+      'actorId',
+      'actorRole',
+      'operationType',
+      'entityType',
+      'entityId',
+      'createdAt',
+      'correlationId',
+    ];
+    const lines = [header.join(',')];
+    for (const item of result.items.slice(0, 10_000)) {
+      lines.push(
+        [
+          item.id,
+          item.actorId,
+          item.actorRole,
+          item.operationType,
+          item.entityType,
+          item.entityId,
+          item.createdAt,
+          item.correlationId,
+        ]
+          .map((value) => `"${String(value ?? '').replace(/"/g, '""')}"`)
+          .join(','),
+      );
+    }
+    return lines.join('\n');
+  }
+
   private toResponse(entry: Partial<AuditLog>) {
     return {
       id: entry.id,

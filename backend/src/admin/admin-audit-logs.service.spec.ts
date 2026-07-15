@@ -41,4 +41,10 @@ describe('AdminAuditLogsService (WO-053)', () => {
     await service.search({ page: 1, pageSize: 5 }, { id: 'admin-1', role: 'Admin' });
     expect(queue.domainMessages.at(-1)?.metadata).toMatchObject({ search_type: 'audit_log_search' });
   });
+
+  it('exports filtered audit rows as CSV', async () => {
+    const csv = await service.exportCsv({ page: 1, pageSize: 5 }, { id: 'admin-1', role: 'Admin' });
+    expect(csv.split('\n').length).toBeGreaterThan(1);
+    expect(csv).toContain('actorId');
+  });
 });
