@@ -2,9 +2,10 @@ import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuditModule } from '../audit/audit.module';
+import { AuditService } from '../audit/audit.service';
+import { FieldHistoryService } from './field-history.service';
 import { AgentModule } from '../agent/agent.module';
 import { ActivitiesModule } from '../activities/activities.module';
-import { AuditService } from '../audit/audit.service';
 import { InMemoryAuditQueuePublisher } from '../audit/authorization-audit.publisher';
 import { Company } from '../database/entities/company.entity';
 import { User } from '../database/entities/user.entity';
@@ -21,6 +22,11 @@ import { OwnershipPatchGuard } from './ownership-patch.guard';
   providers: [
     CompaniesInMemoryService,
     CompanyOwnershipService,
+    {
+      provide: FieldHistoryService,
+      useFactory: (audit: AuditService) => new FieldHistoryService(audit),
+      inject: [AuditService],
+    },
     OwnershipFieldInterceptor,
     OwnershipPatchGuard,
     {

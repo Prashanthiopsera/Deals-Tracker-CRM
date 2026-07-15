@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   BadRequestException,
   Body,
   Controller,
@@ -31,6 +32,7 @@ import { CompaniesService } from './companies.service';
 import { CompanyEnrichmentTrigger } from './company-enrichment.trigger';
 import { CompanyOwnershipService } from './company-ownership.service';
 import { ActivityTimelineService } from '../activities/activity-timeline.service';
+import { FieldHistoryService } from './field-history.service';
 import { OwnershipFieldInterceptor } from './ownership-field.interceptor';
 import { OwnershipPatchGuard } from './ownership-patch.guard';
 
@@ -43,6 +45,7 @@ export class CompaniesController {
     private readonly ownership: CompanyOwnershipService,
     private readonly enrichmentTrigger: CompanyEnrichmentTrigger,
     private readonly activityTimeline: ActivityTimelineService,
+    private readonly fieldHistoryService: FieldHistoryService,
   ) {}
 
   @Get()
@@ -61,6 +64,29 @@ export class CompaniesController {
       };
     } catch {
       throw new NotFoundException({ message: 'Company not found' });
+    }
+  }
+
+  @Get(':id/fields/:fieldName/history')
+  @CedarAuthorize('read', 'Company')
+  async fieldHistory(
+    @Param('id') companyId: string,
+    @Param('fieldName') fieldName: string,
+    @Query('page') page: string | undefined,
+    @Req() req: Request & { user: AuthUserContext },
+  ) {
+    try {
+      return await this.fieldHistoryService.getFieldHistory(
+        companyId,
+        fieldName,
+        req.user.p7vcRole,
+        Number(page ?? 1),
+      );
+    } catch (error) {
+      if (String(error).includes('Forbidden')) {
+        throw new ForbiddenException({ message: 'Field history not accessible' });
+      }
+      throw new NotFoundException({ message: 'Field history unavailable' });
     }
   }
 
