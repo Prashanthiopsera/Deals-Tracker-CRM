@@ -8,7 +8,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { CompanyFundingStage, CompanyStatus, DealStage } from '../enums';
+import { CompanyFundingStage, CompanyStatus, DealStage, PiiClassification } from '../enums';
+import { PiiField } from '../../pii/pii-classification.metadata';
 import { User } from './user.entity';
 
 @Entity({ name: 'companies' })
@@ -78,6 +79,7 @@ export class Company {
   keyDates!: Record<string, string>;
 
   @Column({ type: 'text', nullable: true })
+  @PiiField(PiiClassification.CONFIDENTIAL)
   notes!: string | null;
 
   @Column({ type: 'text', array: true, default: () => "'{}'" })

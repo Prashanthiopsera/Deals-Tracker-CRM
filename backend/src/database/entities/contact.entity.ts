@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { PiiClassification } from '../enums';
+import { PiiField } from '../../pii/pii-classification.metadata';
 import { Company } from './company.entity';
 import { User } from './user.entity';
 
@@ -18,15 +19,19 @@ export class Contact {
   id!: string;
 
   @Column({ name: 'first_name', type: 'varchar', length: 255 })
+  @PiiField(PiiClassification.CONFIDENTIAL)
   firstName!: string;
 
   @Column({ name: 'last_name', type: 'varchar', length: 255 })
+  @PiiField(PiiClassification.CONFIDENTIAL)
   lastName!: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
+  @PiiField(PiiClassification.CONFIDENTIAL)
   email!: string | null;
 
   @Column({ type: 'varchar', length: 64, nullable: true })
+  @PiiField(PiiClassification.CONFIDENTIAL)
   phone!: string | null;
 
   @Column({ type: 'varchar', length: 255, nullable: true })

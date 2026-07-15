@@ -6,6 +6,7 @@ import { AuthorizationModule } from './authorization/authorization.module';
 import { AuditModule } from './audit/audit.module';
 import { AdminModule } from './admin/admin.module';
 import { DatabaseModule } from './database/database.module';
+import { PiiModule } from './pii/pii.module';
 import { CompaniesModule } from './companies/companies.module';
 
 @Module({
@@ -15,6 +16,7 @@ import { CompaniesModule } from './companies/companies.module';
     AuthModule,
     AuditModule,
     AuthorizationModule,
+    PiiModule,
     AdminModule,
     CompaniesModule,
     HealthModule,
