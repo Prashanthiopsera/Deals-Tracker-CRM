@@ -7,7 +7,11 @@ export async function GET(request: NextRequest) {
   const { domain, clientId, baseUrl } = authConfig();
 
   if (sessionId) {
-    await sessionStore.revoke(sessionId);
+    try {
+      await sessionStore.revoke(sessionId);
+    } catch {
+      // Non-fatal — cookies are cleared below regardless
+    }
   }
 
   const params = new URLSearchParams({

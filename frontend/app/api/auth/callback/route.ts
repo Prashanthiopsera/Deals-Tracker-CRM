@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  const response = NextResponse.redirect(`${baseUrl}/`);
+  const response = NextResponse.redirect(`${baseUrl}/dashboard`);
   response.headers.append('Set-Cookie', createSessionCookie(sessionId));
   response.headers.append(
     'Set-Cookie',
