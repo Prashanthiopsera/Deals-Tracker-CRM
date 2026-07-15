@@ -1,0 +1,12 @@
+[
+  { "action": "create", "entity_type": "company", "actor_role": "Director" },
+  { "action": "update", "entity_type": "company", "actor_role": "Associate" },
+  { "action": "delete", "entity_type": "company", "actor_role": "Director" },
+  { "action": "reassign", "entity_type": "company", "actor_role": "Principal" },
+  { "action": "stage_transition", "entity_type": "company", "actor_role": "Associate" },
+  { "action": "ownership_reassignment", "entity_type": "company", "actor_role": "Principal" },
+  { "action": "ai_retrieval", "entity_type": "company", "actor_role": "Director" },
+  { "action": "login", "entity_type": "user", "actor_role": "Director" },
+  { "action": "logout", "entity_type": "user", "actor_role": "Intern" },
+  { "action": "permission_denied", "entity_type": "company", "actor_role": "Intern" }
+]
