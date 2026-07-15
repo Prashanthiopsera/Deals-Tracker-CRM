@@ -8,14 +8,8 @@ import { AdminAuditLogsController } from './admin-audit-logs.controller';
 import { AdminAuditLogsService } from './admin-audit-logs.service';
 import { AdminUsersController } from './admin-users.controller';
 import { AdminUsersService } from './admin-users.service';
+import { SecretsManagerAuth0Client } from './auth0-management.client';
 
-const auth0Mock = {
-  inviteUser: async () => ({ auth0Subject: 'auth0|mock' }),
-  updateRole: async () => undefined,
-  deactivateUser: async () => undefined,
-};
-
-const auditMock = { log: async () => undefined };
 const eventsMock = {
   publishRoleChanged: async () => undefined,
   publishUserDeactivated: async () => undefined,
@@ -25,6 +19,7 @@ const eventsMock = {
   imports: [AuthModule, AuthorizationModule, AuditModule],
   controllers: [AdminUsersController, AdminAuditLogsController],
   providers: [
+    SecretsManagerAuth0Client,
     {
       provide: AdminAuditLogsService,
       useFactory: (audit: AuditService, repo: InMemoryAuditLogRepository) =>
@@ -33,7 +28,9 @@ const eventsMock = {
     },
     {
       provide: AdminUsersService,
-      useFactory: () => new AdminUsersService(auth0Mock, auditMock, eventsMock),
+      useFactory: (auth0: SecretsManagerAuth0Client, audit: AuditService) =>
+        new AdminUsersService(auth0, audit, eventsMock),
+      inject: [SecretsManagerAuth0Client, AuditService],
     },
   ],
 })

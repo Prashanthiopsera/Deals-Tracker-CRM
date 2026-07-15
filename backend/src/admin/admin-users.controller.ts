@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Param,
   Patch,
@@ -21,13 +22,34 @@ import { AdminUsersService } from './admin-users.service';
 export class AdminUsersController {
   constructor(private readonly users: AdminUsersService) {}
 
+  private actor(req: Request & { user: AuthUserContext }) {
+    if (req.user.p7vcRole !== 'Admin') {
+      throw new ForbiddenException('You do not have permission to perform this action');
+    }
+    return { id: req.user.p7vcUserId, role: req.user.p7vcRole };
+  }
+
   @Get()
   @CedarAuthorize('read', 'User')
   list(
     @Query('role') role?: UserRole,
     @Query('status') status?: 'active' | 'inactive' | 'pending',
+    @Query('page') page?: number,
+    @Query('page_size') pageSize?: number,
+    @Req() req?: Request & { user: AuthUserContext },
   ) {
-    return this.users.list({ role, status });
+    this.actor(req!);
+    return this.users.list({ role, status, page, pageSize });
+  }
+
+  @Post('invite')
+  @CedarAuthorize('create', 'User')
+  inviteViaPath(
+    @Body() body: { email: string; fullName: string; role: UserRole },
+    @Req() req: Request & { user: AuthUserContext },
+  ) {
+    const actor = this.actor(req);
+    return this.users.invite(body.email, body.fullName, body.role, actor.id, actor.role);
   }
 
   @Post()
@@ -36,7 +58,8 @@ export class AdminUsersController {
     @Body() body: { email: string; fullName: string; role: UserRole },
     @Req() req: Request & { user: AuthUserContext },
   ) {
-    return this.users.invite(body.email, body.fullName, body.role, req.user.p7vcUserId);
+    const actor = this.actor(req);
+    return this.users.invite(body.email, body.fullName, body.role, actor.id, actor.role);
   }
 
   @Patch(':id/role')
@@ -46,12 +69,21 @@ export class AdminUsersController {
     @Body() body: { role: UserRole },
     @Req() req: Request & { user: AuthUserContext },
   ) {
-    return this.users.changeRole(id, body.role, req.user.p7vcUserId);
+    const actor = this.actor(req);
+    return this.users.changeRole(id, body.role, actor.id, actor.role);
   }
 
   @Patch(':id/deactivate')
   @CedarAuthorize('update', 'User')
   deactivate(@Param('id') id: string, @Req() req: Request & { user: AuthUserContext }) {
-    return this.users.deactivate(id, req.user.p7vcUserId);
+    const actor = this.actor(req);
+    return this.users.deactivate(id, actor.id, actor.role);
+  }
+
+  @Patch(':id/reactivate')
+  @CedarAuthorize('update', 'User')
+  reactivate(@Param('id') id: string, @Req() req: Request & { user: AuthUserContext }) {
+    const actor = this.actor(req);
+    return this.users.reactivate(id, actor.id, actor.role);
   }
 }
