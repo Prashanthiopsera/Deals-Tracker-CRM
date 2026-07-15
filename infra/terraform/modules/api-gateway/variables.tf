@@ -48,3 +48,13 @@ variable "common_tags" {
   type    = map(string)
   default = {}
 }
+
+variable "ops_alert_topic_arn" {
+  type    = string
+  default = ""
+}
+
+variable "aws_region" {
+  type    = string
+  default = "us-east-1"
+}
