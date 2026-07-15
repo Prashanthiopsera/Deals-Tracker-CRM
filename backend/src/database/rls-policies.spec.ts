@@ -2,6 +2,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { buildRlsSessionStatements } from './rls-context.middleware';
 import { ExpandCrmRls1730000000002 } from './migrations/1730000000002-ExpandCrmRls';
+import { ForceCompaniesRls1730000000011 } from './migrations/1730000000011-ForceCompaniesRls';
 
 describe('RLS policies', () => {
   const migrationSource = readFileSync(
@@ -45,5 +46,14 @@ describe('RLS policies', () => {
 
   it('migration class is registered', () => {
     expect(new ExpandCrmRls1730000000002().name).toBe('ExpandCrmRls1730000000002');
+    expect(new ForceCompaniesRls1730000000011().name).toBe('ForceCompaniesRls1730000000011');
+  });
+
+  it('forces row level security on companies table', () => {
+    const forceRlsSource = readFileSync(
+      join(__dirname, 'migrations/1730000000011-ForceCompaniesRls.ts'),
+      'utf8',
+    );
+    expect(forceRlsSource).toContain('FORCE ROW LEVEL SECURITY');
   });
 });
