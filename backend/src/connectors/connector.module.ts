@@ -9,6 +9,8 @@ import { ConnectorRegistry } from './connector.registry';
 import { ActivityQueueService, ConnectorSyncStateService } from './activity/activity-capture.service';
 import { DlpFilterService } from './dlp-filter.service';
 
+import { GoogleOAuthService } from './oauth/google-oauth.service';
+
 @Module({
   imports: [AuditModule],
   providers: [
@@ -17,6 +19,7 @@ import { DlpFilterService } from './dlp-filter.service';
     ConnectorCredentialService,
     ActivityQueueService,
     ConnectorSyncStateService,
+    GoogleOAuthService,
     {
       provide: DlpFilterService,
       useFactory: (audit: AuditService) => new DlpFilterService(audit),
@@ -30,6 +33,7 @@ import { DlpFilterService } from './dlp-filter.service';
     ActivityQueueService,
     ConnectorSyncStateService,
     DlpFilterService,
+    GoogleOAuthService,
   ],
 })
 export class ConnectorModule {}
