@@ -16,9 +16,16 @@ import {
   AdminPoliciesService,
   InMemoryVerifiedPermissionsAdminClient,
 } from './admin-policies.service';
+import { AdminDsarController } from './admin-dsar.controller';
+import {
+  AdminDsarService,
+  InMemoryDsarObjectStore,
+} from './admin-dsar.service';
 import { AdminUsersController } from './admin-users.controller';
 import { AdminUsersService } from './admin-users.service';
 import { SecretsManagerAuth0Client } from './auth0-management.client';
+import { PiiModule } from '../pii/pii.module';
+import { PiiRegistryService } from '../pii/pii-registry.service';
 
 const eventsMock = {
   publishRoleChanged: async () => undefined,
@@ -26,17 +33,19 @@ const eventsMock = {
 };
 
 @Module({
-  imports: [AuthModule, AuthorizationModule, AuditModule],
+  imports: [AuthModule, AuthorizationModule, AuditModule, PiiModule],
   controllers: [
     AdminUsersController,
     AdminAuditLogsController,
     AdminPoliciesController,
     AdminConnectorsController,
+    AdminDsarController,
   ],
   providers: [
     SecretsManagerAuth0Client,
     InMemoryVerifiedPermissionsAdminClient,
     InMemorySecretsManagerClient,
+    InMemoryDsarObjectStore,
     {
       provide: AdminAuditLogsService,
       useFactory: (audit: AuditService, repo: InMemoryAuditLogRepository) =>
@@ -60,6 +69,15 @@ const eventsMock = {
       useFactory: (secrets: InMemorySecretsManagerClient, audit: AuditService) =>
         new AdminConnectorsService(secrets, audit),
       inject: [InMemorySecretsManagerClient, AuditService],
+    },
+    {
+      provide: AdminDsarService,
+      useFactory: (
+        piiRegistry: PiiRegistryService,
+        audit: AuditService,
+        objectStore: InMemoryDsarObjectStore,
+      ) => new AdminDsarService(piiRegistry, audit, objectStore),
+      inject: [PiiRegistryService, AuditService, InMemoryDsarObjectStore],
     },
   ],
 })
