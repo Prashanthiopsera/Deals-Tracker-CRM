@@ -7,6 +7,7 @@ import { AuditModule } from './audit/audit.module';
 import { AdminModule } from './admin/admin.module';
 import { DatabaseModule } from './database/database.module';
 import { PiiModule } from './pii/pii.module';
+import { AiModule } from './ai/ai.module';
 import { CompaniesModule } from './companies/companies.module';
 
 @Module({
@@ -17,6 +18,7 @@ import { CompaniesModule } from './companies/companies.module';
     AuditModule,
     AuthorizationModule,
     PiiModule,
+    AiModule,
     AdminModule,
     CompaniesModule,
     HealthModule,
