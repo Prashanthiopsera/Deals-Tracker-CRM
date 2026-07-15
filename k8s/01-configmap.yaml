@@ -6,8 +6,14 @@ metadata:
 data:
   # ── Shared ──────────────────────────────────────────────────────────────
   NODE_ENV: "production"
-  AUTH0_AUDIENCE: "https://p7vc-crm-api.agent.opsera.dev"
+  # Must match a registered API identifier in the Auth0 tenant (else login
+  # fails with "Service not found"). This is the tenant's registered API.
+  AUTH0_AUDIENCE: "https://api.p7vc-crm.com"
   AUTH0_HOSTED_DOMAIN: "opsera.io"
+  # Public base URL of the frontend. The Auth0 SDK reads APP_BASE_URL and builds
+  # the callback as ${APP_BASE_URL}/api/auth/callback — must be an Allowed
+  # Callback URL in Auth0. (Defaults to http://localhost:3001 if unset.)
+  APP_BASE_URL: "https://p7vc-crm.agent.opsera.dev"
 
   # ── API (backend container) ─────────────────────────────────────────────
   PORT: "3000"
