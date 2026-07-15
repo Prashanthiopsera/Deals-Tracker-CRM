@@ -1,12 +1,10 @@
-import { InMemoryAuditQueuePublisher } from '../audit/authorization-audit.publisher';
 import { DealStage } from '../database/enums';
+import { createCompanyAuditPublisher } from './companies-audit.test-utils';
 import { CompaniesInMemoryService } from './companies-in-memory.service';
-import { SqsCompanyAuditPublisher } from './companies.service';
 
 describe('stage transition service (WO-042)', () => {
-  const service = new CompaniesInMemoryService(
-    new SqsCompanyAuditPublisher(new InMemoryAuditQueuePublisher()),
-  );
+  const { publisher } = createCompanyAuditPublisher();
+  const service = new CompaniesInMemoryService(publisher);
 
   beforeEach(() => service.resetToSeed());
 

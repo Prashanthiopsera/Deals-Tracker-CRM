@@ -63,6 +63,8 @@ export enum AuditAction {
   UPDATE = 'update',
   DELETE = 'delete',
   REASSIGN = 'reassign',
+  STAGE_TRANSITION = 'stage_transition',
+  OWNERSHIP_REASSIGNMENT = 'ownership_reassignment',
   AI_RETRIEVAL = 'ai_retrieval',
   AI_RESPONSE = 'ai_response',
   LOGIN = 'login',

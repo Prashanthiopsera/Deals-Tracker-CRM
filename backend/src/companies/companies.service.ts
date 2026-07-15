@@ -1,8 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
-import { InMemoryAuditQueuePublisher } from '../audit/authorization-audit.publisher';
+import { AuditService } from '../audit/audit.service';
 import { Company } from '../database/entities/company.entity';
 import { CompanyStatus, DealStage } from '../database/enums';
 import { CreateCompanyDto, ListCompaniesQueryDto, ReassignOwnerDto, UpdateCompanyDto } from './companies.dto';
@@ -22,7 +21,7 @@ export interface CompanyAuditPublisher {
 
 @Injectable()
 export class SqsCompanyAuditPublisher implements CompanyAuditPublisher {
-  constructor(private readonly queue: InMemoryAuditQueuePublisher) {}
+  constructor(private readonly audit: AuditService) {}
 
   publishCompanyEvent(input: {
     actorId: string;
@@ -32,17 +31,14 @@ export class SqsCompanyAuditPublisher implements CompanyAuditPublisher {
     after?: Record<string, unknown> | null;
     companyId: string;
   }): void {
-    void this.queue.publish({
-      eventId: randomUUID(),
+    this.audit.publishAuditEvent({
       actorId: input.actorId,
       actorRole: input.actorRole,
-      action: input.action,
+      operation: input.action,
       resourceType: 'Company',
       resourceId: input.companyId,
-      decision: 'allow',
-      source: 'api',
-      timestamp: new Date().toISOString(),
-      requestMetadata: { before: input.before, after: input.after },
+      beforeState: input.before,
+      afterState: input.after,
     });
   }
 }

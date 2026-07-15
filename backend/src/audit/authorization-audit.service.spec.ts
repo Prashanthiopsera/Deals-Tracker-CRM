@@ -1,8 +1,8 @@
 import {
   AuthorizationAuditConsumer,
   AuthorizationAuditService,
-  InMemoryAuditLogRepository,
 } from './authorization-audit.service';
+import { InMemoryAuditLogRepository } from './audit-log.repository';
 import { InMemoryAuditQueuePublisher } from './authorization-audit.publisher';
 import { InMemoryAuthorizationMetrics } from './authorization-audit.metrics';
 import { buildAuthRequest } from '../authorization/cedar.service';
@@ -68,8 +68,8 @@ describe('AuthorizationAuditService', () => {
     );
     await service.processQueuedEvent(event);
     expect(repository.entries).toHaveLength(1);
+    expect(repository.entries[0].actorRole).toBe('Associate');
     expect(repository.entries[0].metadata).toMatchObject({
-      actor_role: 'Associate',
       cedar_policy_id: 'associate-read',
       source: 'api',
     });

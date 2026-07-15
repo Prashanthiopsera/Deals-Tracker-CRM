@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuditModule } from '../audit/audit.module';
+import { AuditService } from '../audit/audit.service';
 import { InMemoryAuditQueuePublisher } from '../audit/authorization-audit.publisher';
 import { Company } from '../database/entities/company.entity';
 import { User } from '../database/entities/user.entity';
@@ -22,8 +23,8 @@ import { OwnershipPatchGuard } from './ownership-patch.guard';
     OwnershipPatchGuard,
     {
       provide: SqsCompanyAuditPublisher,
-      useFactory: (queue: InMemoryAuditQueuePublisher) => new SqsCompanyAuditPublisher(queue),
-      inject: [InMemoryAuditQueuePublisher],
+      useFactory: (audit: AuditService) => new SqsCompanyAuditPublisher(audit),
+      inject: [AuditService],
     },
     {
       provide: CompaniesService,

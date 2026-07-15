@@ -1,16 +1,14 @@
-import { InMemoryAuditQueuePublisher } from '../audit/authorization-audit.publisher';
 import { VerifiedPermissionsClient, buildAuthRequest } from '../authorization/cedar.service';
+import { createCompanyAuditPublisher } from './companies-audit.test-utils';
 import { CompaniesInMemoryService } from './companies-in-memory.service';
-import { SqsCompanyAuditPublisher } from './companies.service';
 
 describe('director-only company deletion (WO-041)', () => {
-  const queue = new InMemoryAuditQueuePublisher();
-  const audit = new SqsCompanyAuditPublisher(queue);
-  const service = new CompaniesInMemoryService(audit);
+  const { queue, publisher } = createCompanyAuditPublisher();
+  const service = new CompaniesInMemoryService(publisher);
   const cedar = new VerifiedPermissionsClient();
 
   beforeEach(() => {
-    queue.messages.length = 0;
+    queue.domainMessages.length = 0;
     service.resetToSeed();
     process.env.CEDAR_BYPASS = 'false';
   });
@@ -21,7 +19,7 @@ describe('director-only company deletion (WO-041)', () => {
       'director-1',
       'Director',
     );
-    expect(queue.messages[0].requestMetadata?.before).toMatchObject({
+    expect(queue.domainMessages[0].beforeState).toMatchObject({
       id: '11111111-1111-1111-1111-111111111111',
     });
     await expect(service.getById('11111111-1111-1111-1111-111111111111')).rejects.toThrow();

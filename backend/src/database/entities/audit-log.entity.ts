@@ -9,6 +9,9 @@ export class AuditLog {
   @Column({ name: 'actor_id', type: 'uuid' })
   actorId!: string;
 
+  @Column({ name: 'actor_role', type: 'varchar', length: 50, default: 'system' })
+  actorRole!: string;
+
   @Column({ type: 'enum', enum: AuditAction, enumName: 'audit_action' })
   action!: AuditAction;
 

@@ -1,24 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { CedarAuthDecision, CedarAuthRequest } from '../authorization/cedar.types';
-import { AuditLog } from '../database/entities/audit-log.entity';
 import { AuditAction } from '../database/enums';
 import { AuthorizationAuditEvent, AuthorizationSource } from './authorization-audit.types';
 import { AuthorizationMetricsPublisher } from './authorization-audit.metrics';
 import { AuditQueuePublisher } from './authorization-audit.publisher';
-
-export interface AuditLogRepository {
-  insert(entry: Partial<AuditLog>): Promise<void>;
-}
-
-@Injectable()
-export class InMemoryAuditLogRepository implements AuditLogRepository {
-  readonly entries: Partial<AuditLog>[] = [];
-
-  async insert(entry: Partial<AuditLog>): Promise<void> {
-    this.entries.push(entry);
-  }
-}
+import { AuditLogRepository } from './audit-log.repository';
 
 @Injectable()
 export class AuthorizationAuditConsumer {
@@ -27,6 +14,7 @@ export class AuthorizationAuditConsumer {
   async persist(event: AuthorizationAuditEvent): Promise<void> {
     await this.repository.insert({
       actorId: event.actorId,
+      actorRole: event.actorRole,
       action: event.decision === 'deny' ? AuditAction.PERMISSION_DENIED : AuditAction.UPDATE,
       entityType: event.resourceType,
       entityId: event.resourceId ?? '00000000-0000-0000-0000-000000000000',
@@ -36,7 +24,6 @@ export class AuthorizationAuditConsumer {
         cedar_action: event.action,
       },
       metadata: {
-        actor_role: event.actorRole,
         cedar_policy_id: event.cedarPolicyId,
         source: event.source,
         request_metadata: event.requestMetadata ?? {},

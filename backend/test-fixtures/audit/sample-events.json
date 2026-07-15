@@ -1,0 +1,35 @@
+[
+  {
+    "operation": "create",
+    "actorRole": "Director",
+    "resourceType": "Company",
+    "afterState": { "name": "Acme Robotics" }
+  },
+  {
+    "operation": "update",
+    "actorRole": "Associate",
+    "resourceType": "Company",
+    "beforeState": { "notes": "old" },
+    "afterState": { "notes": "new" }
+  },
+  {
+    "operation": "delete",
+    "actorRole": "Director",
+    "resourceType": "Company",
+    "beforeState": { "id": "11111111-1111-1111-1111-111111111111" }
+  },
+  {
+    "operation": "reassign",
+    "actorRole": "Principal",
+    "resourceType": "Company",
+    "beforeState": { "deal_lead_id": "aaa" },
+    "afterState": { "deal_lead_id": "bbb" }
+  },
+  {
+    "operation": "stage_transition",
+    "actorRole": "Associate",
+    "resourceType": "Company",
+    "beforeState": { "deal_stage": "sourced" },
+    "afterState": { "deal_stage": "screening" }
+  }
+]

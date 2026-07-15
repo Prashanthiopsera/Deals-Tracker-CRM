@@ -1,14 +1,12 @@
-import { InMemoryAuditQueuePublisher } from '../audit/authorization-audit.publisher';
+import { createCompanyAuditPublisher } from './companies-audit.test-utils';
 import { CompaniesInMemoryService } from './companies-in-memory.service';
-import { SqsCompanyAuditPublisher } from './companies.service';
 
 describe('ownership reassignment (WO-043)', () => {
-  const queue = new InMemoryAuditQueuePublisher();
-  const audit = new SqsCompanyAuditPublisher(queue);
-  const service = new CompaniesInMemoryService(audit);
+  const { queue, publisher } = createCompanyAuditPublisher();
+  const service = new CompaniesInMemoryService(publisher);
 
   beforeEach(() => {
-    queue.messages.length = 0;
+    queue.domainMessages.length = 0;
     service.resetToSeed();
   });
 
@@ -20,6 +18,6 @@ describe('ownership reassignment (WO-043)', () => {
       'Director',
     );
     expect(updated.deal_lead_id).toBe('88888888-8888-8888-8888-888888888888');
-    expect(queue.messages[0].action).toBe('ownership_reassignment');
+    expect(queue.domainMessages[0].operation).toBe('ownership_reassignment');
   });
 });

@@ -1,10 +1,10 @@
 import { NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { InMemoryAuditQueuePublisher } from '../audit/authorization-audit.publisher';
 import { Company } from '../database/entities/company.entity';
 import { CompanyStatus, DealStage } from '../database/enums';
 import { buildValidCompanyPayload } from '../../test-fixtures/companies/company.factory';
-import { CompaniesService, SqsCompanyAuditPublisher } from './companies.service';
+import { createCompanyAuditPublisher } from './companies-audit.test-utils';
+import { CompaniesService } from './companies.service';
 import { validateCreateCompanyDto } from './companies.dto';
 
 describe('CompaniesService', () => {
@@ -25,8 +25,7 @@ describe('CompaniesService', () => {
     deletedAt: null,
   });
 
-  const queue = new InMemoryAuditQueuePublisher();
-  const audit = new SqsCompanyAuditPublisher(queue);
+  const { queue, publisher: audit } = createCompanyAuditPublisher();
 
   const repo = {
     create: jest.fn((input) => Object.assign(new Company(), input)),
@@ -46,7 +45,7 @@ describe('CompaniesService', () => {
   const service = new CompaniesService(repo, audit);
 
   beforeEach(() => {
-    queue.messages.length = 0;
+    queue.domainMessages.length = 0;
     jest.clearAllMocks();
     (repo.findOne as jest.Mock).mockResolvedValue(company);
   });
@@ -59,7 +58,7 @@ describe('CompaniesService', () => {
       'Director',
     );
     expect(result.id).toBeDefined();
-    expect(queue.messages).toHaveLength(1);
+    expect(queue.domainMessages).toHaveLength(1);
   });
 
   it('lists paginated companies excluding deleted by default', async () => {
@@ -71,7 +70,7 @@ describe('CompaniesService', () => {
   it('soft deletes a company and publishes audit event', async () => {
     await service.softDelete(company.id, 'actor-1');
     expect(repo.softRemove).toHaveBeenCalled();
-    expect(queue.messages[0].action).toBe('delete');
+    expect(queue.domainMessages[0].operation).toBe('delete');
   });
 
   it('throws when company is missing', async () => {

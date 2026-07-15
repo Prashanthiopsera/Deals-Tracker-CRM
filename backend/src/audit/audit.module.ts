@@ -1,8 +1,12 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuditLog } from '../database/entities/audit-log.entity';
+import { AuditLogConsumer } from './audit-log.consumer';
+import { InMemoryAuditLogRepository } from './audit-log.repository';
+import { AuditService } from './audit.service';
 import {
   AuthorizationAuditConsumer,
   AuthorizationAuditService,
-  InMemoryAuditLogRepository,
 } from './authorization-audit.service';
 import {
   CloudWatchAuthorizationMetrics,
@@ -16,6 +20,7 @@ import {
 } from './authorization-audit.publisher';
 
 @Module({
+  imports: [TypeOrmModule.forFeature([AuditLog])],
   providers: [
     InMemoryAuditQueuePublisher,
     SqsAuditQueuePublisher,
@@ -24,10 +29,20 @@ import {
     CloudWatchAuthorizationMetrics,
     LayeredAuthorizationMetrics,
     InMemoryAuditLogRepository,
+    AuditLogConsumer,
     {
       provide: AuthorizationAuditConsumer,
       useFactory: (repo: InMemoryAuditLogRepository) => new AuthorizationAuditConsumer(repo),
       inject: [InMemoryAuditLogRepository],
+    },
+    {
+      provide: AuditService,
+      useFactory: (
+        queue: InMemoryAuditQueuePublisher,
+        consumer: AuditLogConsumer,
+        repo: InMemoryAuditLogRepository,
+      ) => new AuditService(queue, consumer, repo),
+      inject: [InMemoryAuditQueuePublisher, AuditLogConsumer, InMemoryAuditLogRepository],
     },
     {
       provide: AuthorizationAuditService,
@@ -39,6 +54,11 @@ import {
       inject: [LayeredAuditQueuePublisher, AuthorizationAuditConsumer, LayeredAuthorizationMetrics],
     },
   ],
-  exports: [AuthorizationAuditService, InMemoryAuditQueuePublisher, InMemoryAuditLogRepository],
+  exports: [
+    AuditService,
+    AuthorizationAuditService,
+    InMemoryAuditQueuePublisher,
+    InMemoryAuditLogRepository,
+  ],
 })
 export class AuditModule {}

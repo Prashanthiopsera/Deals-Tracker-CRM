@@ -1,16 +1,23 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AuthorizationAuditEvent } from './authorization-audit.types';
+import { DomainAuditEvent } from './audit-log.types';
 
 export interface AuditQueuePublisher {
   publish(message: AuthorizationAuditEvent): Promise<void>;
+  publishDomainEvent(message: DomainAuditEvent): Promise<void>;
 }
 
 @Injectable()
 export class InMemoryAuditQueuePublisher implements AuditQueuePublisher {
   readonly messages: AuthorizationAuditEvent[] = [];
+  readonly domainMessages: DomainAuditEvent[] = [];
 
   async publish(message: AuthorizationAuditEvent): Promise<void> {
     this.messages.push(message);
+  }
+
+  async publishDomainEvent(message: DomainAuditEvent): Promise<void> {
+    this.domainMessages.push(message);
   }
 }
 
@@ -45,6 +52,24 @@ export class SqsAuditQueuePublisher implements AuditQueuePublisher {
       this.logger.warn(`Failed to publish authorization audit event: ${String(error)}`);
     }
   }
+
+  async publishDomainEvent(message: DomainAuditEvent): Promise<void> {
+    const client = await this.getClient();
+    const queueUrl = process.env.AUDIT_QUEUE_URL;
+    if (!client || !queueUrl) return;
+
+    try {
+      const { SendMessageCommand } = await import('@aws-sdk/client-sqs');
+      await client.send(
+        new SendMessageCommand({
+          QueueUrl: queueUrl,
+          MessageBody: JSON.stringify({ type: 'domain', ...message }),
+        }),
+      );
+    } catch (error) {
+      this.logger.warn(`Failed to publish domain audit event: ${String(error)}`);
+    }
+  }
 }
 
 @Injectable()
@@ -56,5 +81,9 @@ export class LayeredAuditQueuePublisher implements AuditQueuePublisher {
 
   async publish(message: AuthorizationAuditEvent): Promise<void> {
     await Promise.all([this.memory.publish(message), this.sqs.publish(message)]);
+  }
+
+  async publishDomainEvent(message: DomainAuditEvent): Promise<void> {
+    await Promise.all([this.memory.publishDomainEvent(message), this.sqs.publishDomainEvent(message)]);
   }
 }
